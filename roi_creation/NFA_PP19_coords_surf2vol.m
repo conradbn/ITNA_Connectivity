@@ -19,7 +19,7 @@ for ss = 1:numel(sub_dirs)
     % Set mask data (cortical ribbon)
     mset = ['lh.ribbon.nii'];
     
-    % Set surface boundaries
+    % Set surface Let Here
     sA = 'smoothwm';
     sB = 'pial';
     
