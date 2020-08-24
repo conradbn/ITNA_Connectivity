@@ -147,7 +147,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
     % RUN THE TTEST PIPELINE
     NFA_group_level_TDI_ttest(Inputs,Outputs);
 
-        %% LH - Digit Projections vs Calc - from Pollack&Price19 ROIs
+        %% LH - Digit Projections x Woodcock Johnson Math scores - from Pollack&Price19 ROIs
         covariates = {'Calc' 'Fluency' 'CalcSkills'};
         for ii = 1:numel(covariates)
             c = covariates{ii};
@@ -173,7 +173,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             NFA_group_level_TDI_ttest(Inputs,Outputs);
         end
 
-        %% RH - Digit Projections vs Calc - from Pollack&Price19 ROIs
+        %% RH - Digit Projections x Woodcock Johnson Math scores - from Pollack&Price19 ROIs
         covariates = {'Calc' 'Fluency' 'CalcSkills'};
         for ii = 1:numel(covariates)
             c = covariates{ii};
@@ -199,7 +199,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             NFA_group_level_TDI_ttest(Inputs,Outputs);
         end
         
-        %% LH - Letter Projections vs L- from Pollack&Price19 ROIs
+        %% LH - Letter Projections x Letter Word ID - from Pollack&Price19 ROIs
         covariates = {'LWid'};
         for ii = 1:numel(covariates)
             c = covariates{ii};
@@ -207,7 +207,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             cmdlbl = ['Letter_x_' c '_TDI_ends_surf_lh_6mm_log'];
             % Outputs
             Outputs.dir = [topdir '/Group_StatisticalTests/'];
-            Outputs.maskgroup = [topdir '/Group_Masks/lh_rois_Digit.niml.dset'];
+            Outputs.maskgroup = [topdir '/Group_Masks/lh_rois_Letter.niml.dset'];
             Outputs.cmdlbl = cmdlbl;
             Outputs.lbl =       {'Lp-La'};
             Outputs.script =    ['cmd_' cmdlbl '_3dttest++.txt'];
@@ -225,7 +225,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             NFA_group_level_TDI_ttest(Inputs,Outputs);
         end
 
-        %% RH - Digit Projections vs Calc - from Pollack&Price19 ROIs
+        %% RH - Letter Projections x Letter Word ID - from Pollack&Price19 ROIs
         covariates = {'LWid'};
         for ii = 1:numel(covariates)
             c = covariates{ii};
@@ -233,7 +233,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             cmdlbl = ['Letter_x_' c '_TDI_ends_surf_rh_6mm_log'];
             % Outputs
             Outputs.dir = [topdir '/Group_StatisticalTests/'];
-            Outputs.maskgroup = [topdir '/Group_Masks/rh_rois_Digit.niml.dset'];
+            Outputs.maskgroup = [topdir '/Group_Masks/rh_rois_Letter.niml.dset'];
             Outputs.cmdlbl = cmdlbl;
             Outputs.lbl =       {'Lp-La'};
             Outputs.script =    ['cmd_' cmdlbl '_3dttest++.txt'];
