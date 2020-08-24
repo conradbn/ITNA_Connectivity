@@ -128,7 +128,7 @@ end
 nodes_unique = unique(nodes);
 dlmwrite('rh_rois_Digit.1D',[nodes_unique,ones(size(nodes_unique))],'Delimiter','\t','precision',10)
 unix(['ConvertDset -o_niml -pad_to_node ld141'...
-      ' -input rh_rois_Digit.1D -prefix rh_rois_Digit -node_index_1D rh_rois_Digit.1D[0]']);
+      ' -input rh_rois_Digit.1D -prefix rh_rois -node_index_1D rh_rois_Digit.1D[0]']);
 
 unix('3dcalc -prefix rh_final_group_mask_Digit.niml.dset -a group_50perc_union.rh.niml.dset -b rh_rois_Digit.niml.dset -expr "a*not(b)"');
 
@@ -145,7 +145,7 @@ end
 nodes_unique = unique(nodes);
 dlmwrite('lh_rois_Letter.1D',[nodes_unique,ones(size(nodes_unique))],'Delimiter','\t','precision',10)
 unix(['ConvertDset -o_niml -pad_to_node ld141'...
-      ' -input lh_rois_Letter.1D -prefix lh_rois_Letter -node_index_1D lh_rois_Letter.1D[0]']);
+      ' -input lh_rois_Letter.1D -prefix lh_rois -node_index_1D lh_rois_Letter.1D[0]']);
 
 unix('3dcalc -prefix lh_final_group_mask_Letter.niml.dset -a group_50perc_union.lh.niml.dset -b lh_rois_Letter.niml.dset -expr "a*not(b)"');
 
@@ -163,6 +163,6 @@ end
 nodes_unique = unique(nodes);
 dlmwrite('rh_rois_Letter.1D',[nodes_unique,ones(size(nodes_unique))],'Delimiter','\t','precision',10)
 unix(['ConvertDset -o_niml -pad_to_node ld141'...
-      ' -input rh_rois_Letter.1D -prefix rh_rois_Letter -node_index_1D rh_rois_Letter.1D[0]']);
+      ' -input rh_rois_Letter.1D -prefix rh_rois -node_index_1D rh_rois_Letter.1D[0]']);
 
 unix('3dcalc -prefix rh_final_group_mask_Letter.niml.dset -a group_50perc_union.rh.niml.dset -b rh_rois_Letter.niml.dset -expr "a*not(b)"');

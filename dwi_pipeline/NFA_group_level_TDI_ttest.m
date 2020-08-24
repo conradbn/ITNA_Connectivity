@@ -8,7 +8,6 @@ dir =       Outputs.dir;
 cmdlbl =    Outputs.cmdlbl;
 lbl =       Outputs.lbl;
 script =    Outputs.script;
-output =    Outputs.output;
 maskgroup = Outputs.maskgroup;
 
 % Inputs
@@ -19,7 +18,6 @@ covars =   Inputs.covars;
 covarlbl = Inputs.covarlbl;
 data1 =    Inputs.data1;
 data2 =    Inputs.data2;
-blur =     Inputs.blur;
 
 %% Set up output directory
 cd(dir)
@@ -59,8 +57,10 @@ for ii = 1:numel(hemi)
     h = hemi{ii};
     if ii == 1
         d = data1;
+        mask_expr = 'a*not(b)'; % Use mask
     else
         d = data2;
+        mask_expr = 'a'; % Dont use mask
     end
     
     % Generate group command for surface data
@@ -103,12 +103,12 @@ for ii = 1:numel(hemi)
     % Run group level analysis command
     unix(['tcsh -ef ' s]);
     disp('++ Group level command executed!!');
-
+    
     % Create masked result
     unix(['3dcalc -a ' cmdlbl '_3dttest++.' h '.niml.dset'...
-        ' -b ' maskgroup ...
+        ' -b ' maskgroup '[1]'...
         ' -prefix ' cmdlbl '_3dttest++.' h '.mask.niml.dset'...
-        ' -expr "a*not(b)"']);
+        ' -expr "' mask_expr '"']);
 end
 
     
@@ -118,5 +118,7 @@ end
 %     ' -inset Ttest_Digit-Letter_TDI_ends_lh_3dttest++.default.ETACmaskALL.global.2sid.5perc.nii.gz[9]'...
 %     ' -NN 2 -1sided RIGHT_TAIL 0.5 -clust_nvox 2 -pref_map ETAC.001.clust.order.nii.gz'])
 
-%% Turn off logging
+%% Turn off logging and move log to output folder
 diary off
+movefile([Outputs.dir 'log_' Outputs.cmdlbl '.txt'],tempdir);
+
