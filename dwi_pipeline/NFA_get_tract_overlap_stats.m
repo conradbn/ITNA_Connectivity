@@ -5,14 +5,16 @@
 
 purge 
 
-atlas_names = {'AFQ' 'AFQclipped' 'Recobundles' 'TractSeg' 'Tracula' 'Xtract'};
+atlas_names = {'AFQ' 'Xtract'};%'AFQclipped' 'Recobundles' 'TractSeg' 'Tracula' 
 atlas_dir = '/Volumes/NBL_Projects/Price_NFA/NFA_DWI/Pandora_Atlas';%'/Users/benconrad/Downloads/NITRC-multi-file-downloads'; 
 mask = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_MNI152/MNI152_2009_template_mask.nii.gz';
 
 % Get filenames for each subject
-cd /Users/nbl_imac2/Desktop/Price_NFA_Tractography_MNI152/
+%cd /Users/nbl_imac2/Desktop/Price_NFA_Tractography_MNI152/
+cd /Volumes/BensHD_2020/Price_NFA_Tractography_MNI152
 %niis = subdir('Group_Average_*p-*a_rh_fwhm4.nii.gz'); %'tracks_ss3t_*_combined_Dp-Da_MNI_TDI_fwhm4.nii.gz');
 niis = subdir('Digit-Letter_TDI_rh_4mm_3dttest++_Coef_masked_*.nii'); 
+niis = subdir('tracks_ss3t_*_combined_Dp-Da_MNI_TDI_fwhm4.nii.gz');
 
 %% Run across subjects/atlases
 for ii = 1:numel(atlas_names)
