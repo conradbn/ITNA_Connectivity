@@ -1,6 +1,7 @@
 %% Run tractography using WM FODs from the SS3T/Dhollander pipeline
-% Run track generation algorithm with 10 million streamlines, and then run
-% SIFT2 streamline weighting process
+% Run track generation algorithm with 10 million streamlines, then
+% additonal streamlines from the regions of interest. Combine these
+% streamlines and then run SIFT2 streamline weighting process
 setenv('PATH', [getenv('PATH') ':/usr/local/bin']); % Required on nbl_imac2 when starting from Applications (not terminal)
 purge;
 local_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_MNI152';
@@ -25,7 +26,18 @@ for ii = 1:numel(sub_dirs)
     
     unix('pigz -d fod_wm_norm.mif.gz');
     
-    % Generate streamlines
+    % Generate streamlines for wholebrain
+    % NOTE - the algorithm and cutoff settings are actually the defaults,
+    % but I set them here for clarity
+    unix(['tckgen fod_wm_norm.mif tracks_ss3t_' sub '.tck'...
+      ' -backtrack -crop_at_gmwmi -info'...
+      ' -act aseg_5ttgen.mif '...
+      ' -seed_gmwmi aseg_5tt_gmwmi.mif'...
+      ' -algorithm iFOD2'...
+      ' -select 10M'...
+      ' -cutoff 0.05']);
+    
+    % Generate streamlines for ROIs
     % NOTE - the algorithm and cutoff settings are actually the defaults,
     % but I set them here for clarity
     rois = dir('*binary_vol_al2dwi.nii.gz');
@@ -40,8 +52,8 @@ for ii = 1:numel(sub_dirs)
           ' -cutoff 0.05']);
     end
     
-    % Move wholebrain streamlines to subject directory
-    unix(['mv ../tracks_ss3t_' sub '.tck ' local_dir_sub]);
+%     % Move wholebrain streamlines to subject directory
+%     unix(['mv ../tracks_ss3t_' sub '.tck ' local_dir_sub]);
     
     % Combine streamlines 
     unix(['tckedit *' sub '*.tck tracks_ss3t_' sub '_combined.tck']);
@@ -51,11 +63,12 @@ for ii = 1:numel(sub_dirs)
     % for more valid quantitative tractography measures.
     % NOTE - to make use of SIFT2 output, the weights txt file must be included
     % in further track quantitification tools using "-tck_weights_in" flag
+    % ALSO NOTE - the I removed the -fd_scale_gm flag due to the use of
+    % multi-tissue FOD estimation
     unix(['tcksift2 tracks_ss3t_' sub '_combined.tck'...
          ' fod_wm_norm.mif.gz tracks_sift2_weights_ss3t_' sub '_combined.txt'...
-         ' -act aseg_5ttgen.mif.gz -info -fd_scale_gm'...
-         ' -out_mu tracks_sift2_weights_ss3t_' sub '_combined_prop_coeff.txt']);
-    
+         ' -act aseg_5ttgen.mif.gz -info '...
+         ' -out_mu tracks_sift2_weights_ss3t_' sub '_combined_prop_coeff.txt']);    
      
     %% Create the reduced streamline maps for the ROIs 
     
