@@ -24,7 +24,7 @@ start_dir = '/Volumes/NBL_Projects/Price_NFA/NFA_DWI/ProcessedData';
 cd(start_dir);
 sub_dirs = dir('Price_*');
 
-for ii = 1:15%numel(sub_dirs)
+for ii = 1:numel(sub_dirs)
     cd(start_dir)
     cd([sub_dirs(ii).name '/PREPROCESSED']);
     sub = strsplit(sub_dirs(ii).name,'_');

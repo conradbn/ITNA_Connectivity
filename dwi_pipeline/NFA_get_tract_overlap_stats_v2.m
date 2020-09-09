@@ -49,7 +49,7 @@ cd /Volumes/NBL_Projects/Price_NFA/NFA_DWI/Group_StatisticalTests
 load('/Volumes/NBL_Projects/Price_NFA/NFA_DWI/Group_StatisticalTests/overlap_AFQ_Xtract_allsubs_lh.mat');
 h = 'left';
 close all
-cost_fxn = 10; %Pearson correlation
+cost_fxn = 14; %10 =Pearson correlation
 for ii = 1:numel(atlas_names)
     a_name = atlas_names{ii};
     d = overlap.(a_name)(:,:,cost_fxn);
@@ -113,7 +113,7 @@ for ii = 1:numel(atlas_names)
     low = min(d_Combined(:));
     high = max(d_Combined(:));
     ax.YLim = [low-.05 high+.05];
-    export_fig(['bundle_overlap_' h '_' a_name],'-png','-m2');
+    %export_fig(['bundle_overlap_' h '_' a_name],'-png','-m2');
     
     % TTests
     [htest,p,ci,stat] = ttest(d_Digit,d_Letter,'Alpha',0.05/size(d,2)); % Bonferoni corrected
@@ -166,7 +166,7 @@ for ii = 1:numel(atlas_names)
     ax.YLabel.FontSize = 30;
     ax.YLabel.FontWeight = 'bold';
     
-    export_fig(['bundle_overlap_differences_' h '_' a_name],'-png','-m2');
+    %export_fig(['bundle_overlap_differences_' h '_' a_name],'-png','-m2');
     
     clear t_sig l2 l b
     

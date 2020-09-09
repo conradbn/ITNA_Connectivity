@@ -11,7 +11,7 @@ mask = '/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152/MNI152_2009_template_
 
 % Get filenames for each subject
 cd /Volumes/BensHD_2020/Price_NFA_Tractography_MNI152
-niis = subdir('tracks_ss3t_*_combined_*p-*a.rh.MNI.TDI.smooth6mm.nii.gz');
+niis = subdir('tracks_ss3t_*_combined_*p-*a.lh.MNI.TDI.smooth6mm.nii.gz');
 
 %% Run across subjects/atlases
 % Set thresholds
@@ -48,7 +48,8 @@ end
 
 %% Plot full results
 %cd /Volumes/NBL_Projects/Price_NFA/NFA_DWI/Group_StatisticalTests
-%load('/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152/dice_AFQ_allsubs_lh.mat');
+%load('/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152/dice_AFQ_Xtract_allsubs_lh.mat');
+save('/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152/dice_AFQ_Xtract_allsubs_lh.mat');
 h = 'left';
 close all
 
@@ -115,7 +116,7 @@ for ii = 1:numel(atlas_names)
     low = min(d_Combined(:));
     high = max(d_Combined(:));
     ax.YLim = [low-.05 high+.05];
-    %export_fig(['bundle_overlap_' h '_' a_name],'-png','-m2');
+    export_fig(['bundle_overlap_' h '_' a_name],'-png','-m2');
 
     
     
@@ -155,7 +156,7 @@ for ii = 1:numel(atlas_names)
     ax.GridAlpha = .2;
     ax.GridLineStyle = '--';
     % Title
-    ax.Title.String = ['Streamline density overlap with ' a_name ' bundles for ' h ' hemisphere ROIs'];
+    ax.Title.String = ['Bundle overlap difference between Digit and Letter regions'];
     ax.Title.Interpreter = 'none';
     ax.Title.FontSize = 30;
     % X Ticks
@@ -169,7 +170,7 @@ for ii = 1:numel(atlas_names)
     ax.XLabel.String = 'Bundle';
     ax.XLabel.FontSize = 30;
     ax.XLabel.FontWeight = 'bold';
-    ax.YLabel.String = 'Dice coefficient between thresholded/binarized images';
+    ax.YLabel.String = 'Difference in Dice coefficient';
     ax.YLabel.FontSize = 30;
     ax.YLabel.FontWeight = 'bold';
     ax.TickLabelInterpreter = 'none';
@@ -179,7 +180,7 @@ for ii = 1:numel(atlas_names)
     high = max(d_Diff(:));
     ax.YLim = [low-.05 high+.05];
     
-    
+    export_fig(['bundle_overlap_differences_' h '_' a_name],'-png','-m2');
 %     % TTests
 %     [htest,p,ci,stat] = ttest(d_Digit,d_Letter,'Alpha',0.05/size(d,2)); % Bonferoni corrected
 %     ind = 1;
