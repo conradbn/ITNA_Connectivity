@@ -6,12 +6,13 @@
 purge 
 
 atlas_names = {'AFQ','Xtract'};% 'Xtract'};%'AFQclipped' 'Recobundles' 'TractSeg' 'Tracula' 
-atlas_dir = '/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152/Pandora_Atlas';%'/Users/benconrad/Downloads/NITRC-multi-file-downloads'; 
-mask = '/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152/MNI152_2009_template_mask.nii.gz';
+atlas_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface/Pandora_Atlas';%'/Users/benconrad/Downloads/NITRC-multi-file-downloads'; 
+mask = [atlas_dir '/MNI152_2009_template_mask.nii.gz'];
 
 % Get filenames for each subject
-cd /Volumes/BensHD_2020/Price_NFA_Tractography_MNI152
-niis = subdir('tracks_ss3t_*_combined_*p-*a.lh.MNI.TDI.smooth6mm.nii.gz');
+process_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface';
+cd(process_dir);
+niis = subdir('tracks_ss3t_*_50M_*p-*a.lh.MNI.TDI.6mm.nii.gz');
 
 %% Run across subjects/atlases
 % Set thresholds
@@ -42,15 +43,17 @@ for ii = 1:numel(atlas_names)
         dice_all.(a_name)(kk,:) = dice; clear dice
     end
     % Add tract label names to structure
-    dice_all.([a_name '_labels'])(:) = a_table.FileName';
+    dice_all.([a_name '_labels'])(:) = a_table.BundleName';
 end
 
 
 %% Plot full results
-%cd /Volumes/NBL_Projects/Price_NFA/NFA_DWI/Group_StatisticalTests
-%load('/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152/dice_AFQ_Xtract_allsubs_lh.mat');
-save('/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152/dice_AFQ_Xtract_allsubs_lh.mat');
-h = 'left';
+% save([process_dir '/Tract_Overlap/dice_AFQ_Xtract_allsubs_lh.mat']);
+% load([process_dir '/Tract_Overlap/dice_AFQ_Xtract_allsubs_lh.mat']);
+% h = 'left';
+
+load([process_dir '/Tract_Overlap/dice_AFQ_Xtract_allsubs_rh.mat']);
+h = 'right';
 close all
 
 for ii = 1:numel(atlas_names)
@@ -61,7 +64,23 @@ for ii = 1:numel(atlas_names)
     d_Letter = d(2:2:end,:);
     d_Combined = cat(3,d_Digit,d_Letter);
     
-    % Plot Raw Dice
+    %% Find significant above zero overlap for both ROIs
+    ind_keep = [];
+    for kk = 1:size(d_Combined,2)
+        dig = d_Combined(:,kk,1);
+        let = d_Combined(:,kk,2);
+        if mean(dig) >= 0.1 || mean(let) >= 0.1
+            ind_keep(kk) = true;
+        else
+            ind_keep(kk) = false;
+        end
+    end
+    ind_keep = logical(ind_keep);
+    
+    d_Combined = d_Combined(:,ind_keep,:);
+    l = l(1,ind_keep); 
+    
+    %% Plot Raw Dice
     figure('Position',[100,100,2000,1200]);
     % Line at zero
     yline(0,'LineWidth',3);
@@ -74,9 +93,10 @@ for ii = 1:numel(atlas_names)
     % Custom Boxplots
     import iosr.statistics.*
     bp = boxPlot(d_Combined);
+    view([-270 90])
     bp.boxColor = {[.9 .3 .3] [.3 .3 .9]};
     bp.lineWidth = 2;
-    bp.boxWidth = .35;
+    bp.boxWidth = .25;
     bp.lineColor = {[.9 .3 .3] [.3 .3 .9]};
     bp.medianColor = {[.9 .3 .3] [.3 .3 .9]};
     bp.showMean = true;
@@ -98,9 +118,7 @@ for ii = 1:numel(atlas_names)
     ax.Title.FontSize = 30;
     % X Ticks
     ax.XTick = 1:numel(l)*2;
-    ax.XTickLabelRotation = 270;
     ax.XTickLabel = l;
-    ax.XTickLabelRotation = 270;
     ax.XAxis.FontSize = 12;
     ax.XAxis.FontWeight = 'bold';
     % Axis labels
@@ -120,8 +138,8 @@ for ii = 1:numel(atlas_names)
 
     
     
-    % Plot Dice Diff
-    d_Diff = d_Digit - d_Letter;
+    %% Plot Dice Diff
+    d_Diff = d_Combined(:,:,1) - d_Combined(:,:,2);
     figure('Position',[100,100,2000,1200]);
     % Line at zero
     yline(0,'LineWidth',3);
@@ -134,6 +152,7 @@ for ii = 1:numel(atlas_names)
     % Custom Boxplots
     import iosr.statistics.*
     bp = boxPlot(d_Diff);
+    view([-270 90])
 %     bp.boxColor = {[.9 .3 .3] [.3 .3 .9]};
     bp.boxColor = {[.6 .3 .6]};
     bp.lineWidth = 2;
@@ -156,14 +175,12 @@ for ii = 1:numel(atlas_names)
     ax.GridAlpha = .2;
     ax.GridLineStyle = '--';
     % Title
-    ax.Title.String = ['Bundle overlap difference between Digit and Letter regions'];
+    ax.Title.String = ['Bundle overlap difference between Digit and Letter ROIs'];
     ax.Title.Interpreter = 'none';
     ax.Title.FontSize = 30;
     % X Ticks
     ax.XTick = 1:numel(l);
-    ax.XTickLabelRotation = 270;
     ax.XTickLabel = l;
-    ax.XTickLabelRotation = 270;
     ax.XAxis.FontSize = 12;
     ax.XAxis.FontWeight = 'bold';
     % Axis labels
@@ -181,6 +198,8 @@ for ii = 1:numel(atlas_names)
     ax.YLim = [low-.05 high+.05];
     
     export_fig(['bundle_overlap_differences_' h '_' a_name],'-png','-m2');
+    
+    
 %     % TTests
 %     [htest,p,ci,stat] = ttest(d_Digit,d_Letter,'Alpha',0.05/size(d,2)); % Bonferoni corrected
 %     ind = 1;

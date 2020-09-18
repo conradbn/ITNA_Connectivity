@@ -8,8 +8,8 @@ clear all
 
 cd('/Volumes/BensHD_2020/Price_NFA_Tractography_MNI152')
 
-% files = subdir('tracks*6mm.niml.dset.1D.smrec');
-files = subdir('tracks*4mm.niml.dset.1D.smrec');
+files = subdir('tracks*6mm.niml.dset.1D.smrec');
+%files = subdir('tracks*4mm.niml.dset.1D.smrec');
 
 for ii = 1:numel(files) 
      fid = fopen(files(ii).name);
@@ -32,9 +32,9 @@ for ii = 1:numel(files)
      end
 end
 % Median sigma
-median(outdata(:,1))
+sigma = median(outdata(:,1))
 % Median Niters
-median(outdata(:,2))
+Niters = median(outdata(:,2))
 
 %% Save to file
 %save('surface_smoothing_parameters_to_6mm_fwhm')

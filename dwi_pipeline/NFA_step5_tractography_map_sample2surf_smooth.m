@@ -23,7 +23,7 @@ purge
 start_dir = '/Volumes/NBL_Projects/Price_NFA/NFA_DWI/ProcessedData';
 cd(start_dir);
 sub_dirs = dir('Price_*');
-local_dir = '/Volumes/BensHD_2020/Price_NFA_Tractography_Surface';
+local_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface';
 
 %% Loop through subjects
 for ii = 1:numel(sub_dirs)
@@ -83,7 +83,7 @@ for ii = 1:numel(sub_dirs)
                 ' ' tck '.TDI_ends.nii']);
             
             % Scale by the subject-specific proportionality coefficient (mu)
-            unix(['3dcalc -a ' tck '.TDI_ends.nii'...
+            unix(['3dcalc -overwrite -a ' tck '.TDI_ends.nii'...
                 ' -prefix ' tck '.TDI_ends.norm.nii'...
                 ' -expr "a* ' num2str(mu) '"']);
             
@@ -115,7 +115,7 @@ for ii = 1:numel(sub_dirs)
         ' ' tck '.wholebrain_TDI_ends.nii']);
     
     % Scale by the subject-specific proportionality coefficient (mu)
-    unix(['3dcalc -a ' tck '.wholebrain_TDI_ends.nii'...
+    unix(['3dcalc -overwrite -a ' tck '.wholebrain_TDI_ends.nii'...
         ' -prefix ' tck '.wholebrain_TDI_ends.norm.nii'...
         ' -expr "a* ' num2str(mu) '"']);
     
@@ -242,8 +242,8 @@ function [] = sample2surf_and_smooth(surfvol,spec,parent,out,log_xform)
     k = '6';
     unix(['SurfSmooth -overwrite -spec ' spec...
         ' -surf_A smoothwm -met HEAT_07 '... % -fwhm ' k
-        ' -Niter 28'...
-        ' -sigma 0.3683'... % -Niter 11 -sigma 0.3679 = params for 4mm'...
+        ' -Niter 35'...
+        ' -sigma 0.3679'... % -Niter 11 -sigma 0.3679 = params for 4mm'...
         ' -input ' out...
         ' -output ' out(1:end-10) '.' k 'mm.niml.dset']);
     
@@ -252,7 +252,7 @@ function [] = sample2surf_and_smooth(surfvol,spec,parent,out,log_xform)
         % analyses)
         unix(['3dcalc -overwrite -prefix ' out(1:end-10) '.' k 'mm.log.niml.dset'...
             ' -a ' out(1:end-10) '.' k 'mm.niml.dset'...
-            ' -expr "log(a)"']);
+            ' -expr "log10(a)"']);
     end
 end
 
