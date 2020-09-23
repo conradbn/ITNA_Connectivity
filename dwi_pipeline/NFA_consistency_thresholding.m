@@ -3,7 +3,7 @@ cd('/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface/Group_Data')
 fnames = dir('all_subs*p-*a.*.TDI_ends.norm.al2anat.*.6mm.niml.dset');
 
 % Set proportion to keep based on consistency
-prop_edges_keep = 0.30; % i.e. 0.30 = 30% density, based on edge consistency
+prop_edges_keep = 0.005 ; % i.e. 0.30 = 30% density, based on edge consistency
 
 % Set proportion of subjects required to have non-zero value.
 % This is important because 0 values will be converted to NaN, and thus
