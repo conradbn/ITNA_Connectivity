@@ -28,8 +28,10 @@ function [tfce_ds] = NFA_run_TFCE(surf_ds,vertices,faces,niters,out)
     % necessary to specify the mean under the null hypothesis
     % (when testing classification accuracies, h0_mean should be set to chance
     % level, assuming a balanced crossvalidation scheme was used)
-
-    %opt.h0_mean=0;
+    
+    if sum(unique(surf_ds.sa.targets)) == 1
+        opt.h0_mean=0;
+    end
 
     % this example uses the data itself (with resampling) to obtain cluster
     % statistcs under the null hypothesis. This is (in this case) somewhat
