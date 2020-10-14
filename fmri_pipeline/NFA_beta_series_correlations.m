@@ -16,15 +16,16 @@ for sub = 1:numel(fnames)
     cd(dir_start)
     cd(fnames(sub).name);
     var_file = dir('workspace_variables_post*.mat');
-    load(var_file.name,'subj','dir_results','dir_nii','dir_onset','dir_fs');
+    v = load(var_file.name,'subj','dir_results','dir_nii','dir_onset','dir_fs');
     
     % Correct folder paths to direct to server
     tmp = '/Users/nbl_imac/Documents/afni_tmp/';
     server = '/Volumes/NBL_Projects/Price_NFA/NFA_fMRI/ProcessedData/';
-    dir_results = strrep(dir_results,tmp,server);
-    dir_nii = strrep(dir_nii,tmp,server);
-    dir_onset = strrep(dir_onset,tmp,server);
-    dir_fs = strrep(dir_fs,tmp,server);
+    dir_results = strrep(v.dir_results,tmp,server);
+    dir_nii = strrep(v.dir_nii,tmp,server);
+    dir_onset = strrep(v.dir_onset,tmp,server);
+    dir_fs = strrep(v.dir_fs,tmp,server);
+    subj = v.subj;
     
     % Set beta series results folder
     dir_beta = [dir_nii subj '.beta_series'];
@@ -40,6 +41,11 @@ for sub = 1:numel(fnames)
     events = readmatrix([subj '_event_list.txt']);
     events = reshape(events',1,[])';
     events(isnan(events)) = [];
+    
+    % Write file with event counts
+    ecounts = []; % because some subjects don't have error and/or ommission events, e.g. only 5 event types instead of 6
+    [ecounts(:,1), ecounts(:,2)] = groupcounts(events);
+    writematrix(ecounts,[subj '_event_counts.txt']);
     
     %% Now, get the (per stimulus) censor data from afni files
     % Open afni_proc "review" txt output file to get number of censored TRs per stimulus trials
@@ -60,10 +66,17 @@ for sub = 1:numel(fnames)
         error('ERROR - Event list and censor info do not match in length');
     end
     
-    % Set events to be censored
+    % Set events to be censored (i.e., if more than 1 volume is censored
+    % within the estimated HRF which is = 6 or 7 2s volumes)
     events_censor = num_TRs_censored > 1;
     
-    %% For each hemisphere
+    %% Create beta-series correlation maps and z-score of difference
+    label = {'Da' 'La' 'Dp' 'Lp'}; % Order is alphabetical based on onset filenames (Ca_Dig,Ca_Let,Cp_Dig,Cp_Let)
+    contrast = {'Dp','Da';
+                'Dp','Lp';
+                'Lp','La'};
+             
+    % For seeds in each hemisphere
     for hh = 1:numel(hemi)
         h = hemi{hh};
         
@@ -88,24 +101,116 @@ for sub = 1:numel(fnames)
             writematrix(bs_seed,[s '.' h '.beta_series.1D'],'FileType','text');
             
             % For the first 4 event types (Ca_Dig,Ca_Let,Cp_Dig,Cp_Let)
-            label = {'Da' 'La' 'Dp' 'Lp'};
-            for ee = 1:4
+            for ee = 1:numel(label)
+                e = label{ee};
                 % For the data in each hemisphere
                 for hhh = 1:numel(hemi)
                     hem = hemi{hhh};
+                    %% True beta series correlations
                     % Read in the beta series dataset
                     betas = [dir_beta '/' subj '_' hem '_LSS_betas.niml.dset'];
-                    bb = afni_niml_readsimple(betas);
+                    betas_read = afni_niml_readsimple(betas);
                     % Get the index for this event type
                     idx = events == ee & events_censor == 0;
                     % Calculate correlation at every node
                     bs_corr = corr(bs_seed(idx),b.data(:,idx)');
                     % Write new niml surface dataset
-                    bcorr = bb;
+                    bcorr = betas_read;
                     bcorr.data = bs_corr';
-                    afni_niml_writesimple(bcorr,[subj '.' s '.' h '.beta_series_corr.' hem '.Rmap.' label{ee} '.niml.dset']);
+                    afni_niml_writesimple(bcorr,[subj '.' s '.' h '.beta_series_corr.' hem '.Rmap.' e '.niml.dset']);
+                    % Fisher Z transform
                     bcorr.data = atanh(bcorr.data);
-                    afni_niml_writesimple(bcorr,[subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' label{ee} '.niml.dset']);
+                    afni_niml_writesimple(bcorr,[subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' e '.niml.dset']);
+                    
+                    %% Null beta series correlations
+                    % Now create a null dataset based on random set of
+                    % betas for significance testing
+                    % Get the index for this event type
+                    events_all = find(events_censor ==0);
+                    % Set up new dataset
+                    bcorr_null = bcorr;
+                    for nn = 1:100
+                        idx_null = randperm(length(events_all),sum(idx));
+                        idx_null = events_all(idx_null);
+                        % Calculate correlation at every node
+                        bs_corr = corr(bs_seed(idx_null),b.data(:,idx_null)');
+                        bcorr_null.data(:,nn) = bs_corr';
+                    end
+                    afni_niml_writesimple(bcorr_null,[subj '.' s '.' h '.beta_series_corr.' hem '.Rmap.' e '_null.niml.dset']);
+                    % Fisher Z transform
+                    bcorr_null.data = atanh(bcorr_null.data);
+                    afni_niml_writesimple(bcorr_null,[subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' e '_null.niml.dset']);
+                     
+                    %% Baseline beta series correlations 
+                    % Now create mean connectivity map across ALL trials
+                    % and all OTHER trials
+                    % Only do the ALL trials map once
+                    if ee == 1
+                        % Get index for ALL trials (uncensored)
+                        events_all = find(events_censor == 0);
+                        % Calculate correlation at every node
+                        bs_corr = corr(bs_seed(events_all),b.data(:,events_all)');
+                        bcorr_all.data = bs_corr';
+                        afni_niml_writesimple(bcorr_all,[subj '.' s '.' h '.beta_series_corr.' hem '.Rmap.ALL.niml.dset']);
+                        % Fisher Z transform
+                        bcorr_all.data = atanh(bcorr_all.data);
+                        afni_niml_writesimple(bcorr_all,[subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.ALL.niml.dset']);
+                    end
+                    % Across OTHER trials
+                    events_other = events ~= ee & events_censor == 0;
+                    % Calculate correlation at every node
+                    bs_corr = corr(bs_seed(events_other),b.data(:,events_other)');
+                    bcorr_other.data = bs_corr';
+                    afni_niml_writesimple(bcorr_other,[subj '.' s '.' h '.beta_series_corr.' hem '.Rmap.' e '_OTHER.niml.dset']);
+                    % Fisher Z transform
+                    bcorr_other.data = atanh(bcorr_other.data);
+                    afni_niml_writesimple(bcorr_other,[subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' e '_OTHER.niml.dset']);
+                    
+                    %% Stimulus vs OTHER
+                    % Get number of observations for each stimulus type
+                    n1 = sum(events == ee & events_censor == 0);
+                    n2 = sum(events_other);
+                    % True data
+                    z1 = afni_niml_readsimple([subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' e '.niml.dset']);
+                    z2 = afni_niml_readsimple([subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' e '_OTHER.niml.dset']);
+                    % Difference in Fisher Z values, taking into account degrees of freedom
+                    zdiff = (z1.data - z2.data)./sqrt(1/(n1-3) + 1/(n2-3));
+                    zout = z1;
+                    zout.data = zdiff;
+                    afni_niml_writesimple(zout,[subj '.' s '.' h '.beta_series_corr.' hem '.Zdiff.' e '-OTHER.niml.dset']);
+                    
+                end
+            end
+            
+            % Create statistical contrast maps (Fisher-Z difference, as a z-score)
+            % For each contrast
+            for cc = 1:size(contrast,1)
+                % Get condition labels for contrasting
+                c1 = contrast{cc,1};
+                c2 = contrast{cc,2};
+                % Get number of observations for each stimulus type
+                n1 = ecounts(strcmp(label,c1),1);
+                n2 = ecounts(strcmp(label,c2),1);
+                % For the data in each hemisphere
+                for hhh = 1:numel(hemi)
+                    hem = hemi{hhh};
+                    % True data
+                    z1 = afni_niml_readsimple([subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' c1 '.niml.dset']);
+                    z2 = afni_niml_readsimple([subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' c2 '.niml.dset']);
+                    % Difference in Fisher Z values, taking into account degrees of freedom
+                    zdiff = (z1.data - z2.data)./sqrt(1/(n1-3) + 1/(n2-3));
+                    zout = z1;
+                    zout.data = zdiff;
+                    afni_niml_writesimple(zout,[subj '.' s '.' h '.beta_series_corr.' hem '.Zdiff.' c1 '-' c2 '.niml.dset']);
+                    
+                    % Null data
+                    z1 = afni_niml_readsimple([subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' c1 '_null.niml.dset']);
+                    z2 = afni_niml_readsimple([subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' c2 '_null.niml.dset']);
+                    % Difference in Fisher Z values, taking into account degrees of freedom
+                    zdiff = (z1.data - z2.data)./sqrt(1/(n1-3) + 1/(n2-3));
+                    zout = z1;
+                    zout.data = zdiff;
+                    afni_niml_writesimple(zout,[subj '.' s '.' h '.beta_series_corr.' hem '.Zdiff.' c1 '-' c2 '_null.niml.dset']);                
                 end
             end
         end

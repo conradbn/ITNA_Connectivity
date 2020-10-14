@@ -1,5 +1,5 @@
 %% Run Threshold-Free Cluster Enhancement (TFCE)
-function [tfce_ds] = NFA_run_TFCE(surf_ds,vertices,faces,niters,out)
+function [tfce_ds] = NFA_run_TFCE(surf_ds,vertices,faces,niters,out,surf_ds_null)
     % All data is prepared; surf_ds has 8 samples and 5124 nodes. We want to
     % see if there are clusters that show a significant difference from zero in
     % their response. Thus, .sa.targets is set to all ones (the same
@@ -40,11 +40,17 @@ function [tfce_ds] = NFA_run_TFCE(surf_ds,vertices,faces,niters,out)
     % cost), one can generate a set of (say, 50) datasets using permuted data
     % e.g. using cosmo_randomize_targets), put them in a cell and provide
     % them as the null argument.
-    opt.null=[];
-
+    if isempty(surf_ds_null)
+        opt.null=[];
+    else
+        opt.null = surf_ds_null;
+    end
+    
+    % Use parallel computing
+    opt.nproc = 8;
     fprintf('Running multiple-comparison correction with these options:\n');
     cosmo_disp(opt);
-
+    
     % Run TFCE-based cluster correction for multiple comparisons.
     % The output has z-scores for each node indicating the probablity to find
     % the same, or higher, TFCE value under the null hypothesis
