@@ -5,18 +5,18 @@
 
 purge 
 
-atlas_names = {'AFQ','Xtract'};% 'Xtract'};%'AFQclipped' 'Recobundles' 'TractSeg' 'Tracula' 
+atlas_names = {'Xtract'};% {'AFQ','AFQclipped' 'Recobundles' 'TractSeg' 'Tracula'} 
 atlas_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface/Pandora_Atlas';%'/Users/benconrad/Downloads/NITRC-multi-file-downloads'; 
 mask = [atlas_dir '/MNI152_2009_template_mask.nii.gz'];
 
 % Get filenames for each subject
 process_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface';
 cd(process_dir);
-niis = subdir('tracks_ss3t_*_50M_*p-*a.lh.MNI.TDI.6mm.nii.gz');
+niis = subdir('tracks_ss3t_*_50M_*p-*a.rh.MNI.TDI.6mm.nii.gz');
 
 %% Run across subjects/atlases
 % Set thresholds
-tract_thresh = 0.25;
+tract_thresh = 0.75;
 tdi_thresh = 5;
 % Loop
 for ii = 1:numel(atlas_names)
@@ -48,12 +48,9 @@ end
 
 
 %% Plot full results
-% save([process_dir '/Tract_Overlap/dice_AFQ_Xtract_allsubs_lh.mat']);
-% load([process_dir '/Tract_Overlap/dice_AFQ_Xtract_allsubs_lh.mat']);
-% h = 'left';
-
-load([process_dir '/Tract_Overlap/dice_AFQ_Xtract_allsubs_rh.mat']);
-h = 'right';
+%save([process_dir '/Tract_Overlap/dice_Xtract_allsubs_rh.mat']);
+load([process_dir '/Tract_Overlap/dice_Xtract_allsubs_lh.mat']);
+h = 'left';%h = 'left';
 close all
 
 for ii = 1:numel(atlas_names)
@@ -79,9 +76,17 @@ for ii = 1:numel(atlas_names)
     
     d_Combined = d_Combined(:,ind_keep,:);
     l = l(1,ind_keep); 
+        
+    %% Run Ttests
+    for tt = 1:size(d_Combined,2)
+        [~,p,ci,t] = ttest(d_Combined(:,tt,1),d_Combined(:,tt,2));
+        stats(tt,1) = t.tstat;
+        stats(tt,2) = p;
+    end
+    stats(:,2) = stats(:,2)./size(d_Combined,2); % Bonferoni correction
     
     %% Plot Raw Dice
-    figure('Position',[100,100,2000,1200]);
+    figure('Position',[100,100,1500,1400]);
     % Line at zero
     yline(0,'LineWidth',3);
     hold on
@@ -95,7 +100,7 @@ for ii = 1:numel(atlas_names)
     bp = boxPlot(d_Combined);
     view([-270 90])
     bp.boxColor = {[.9 .3 .3] [.3 .3 .9]};
-    bp.lineWidth = 2;
+    bp.lineWidth = 1.5;
     bp.boxWidth = .25;
     bp.lineColor = {[.9 .3 .3] [.3 .3 .9]};
     bp.medianColor = {[.9 .3 .3] [.3 .3 .9]};
@@ -108,7 +113,7 @@ for ii = 1:numel(atlas_names)
     % bp.symbolColor = [.8 .8 .8]
     grid on
     ax = gca;
-    ax.FontSize = 17;
+    ax.FontSize = 25;
     %ax.YLim = [0.1 0.5];
     ax.GridAlpha = .2;
     ax.GridLineStyle = '--';

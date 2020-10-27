@@ -47,7 +47,7 @@ function [tfce_ds] = NFA_run_TFCE(surf_ds,vertices,faces,niters,out,surf_ds_null
     end
     
     % Use parallel computing
-    opt.nproc = 1;
+    opt.nproc = 8;
     fprintf('Running multiple-comparison correction with these options:\n');
     cosmo_disp(opt);
     
