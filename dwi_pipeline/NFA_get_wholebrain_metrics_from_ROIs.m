@@ -49,6 +49,14 @@ for ii = 1:numel(subs)
     end
 end
 
+%% Convert to table for easier later parsing
+T = table();
+T.("Dp-Lp_seed_TDIends_lh") = out_l_mean(:,1,1);
+T.("Dp-Lp_seed_Length_lh") = out_l_mean(:,1,2);
+T.("Dp-Lp_seed_TDIends_rh") = out_r_mean(:,2,1);
+T.("Dp-Lp_seed_Length_rh") = out_r_mean(:,2,2);
+save('TDI_endpoint_density_and_length.mat','T');
+
 %% Ttests
 
 [~,p,~,t] = ttest(out_l_mean(:,1,1),out_l_mean(:,2,1));
