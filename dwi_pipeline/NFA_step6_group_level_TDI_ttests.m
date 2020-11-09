@@ -185,6 +185,28 @@ Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2ana
 NFA_group_level_TDI_ttest(Inputs,Outputs);
 
 
+%% RH - Math Region Projection Ends - from Pollack&Price19 ROIs
+% Condition label
+cmdlbl = 'Digit_Math_TDI_ends_surf_rh_6mm_log+c';
+% Outputs
+Outputs.dir = [topdir '/Group_StatisticalTests/'];
+Outputs.maskgroup = [topdir '/Group_Masks/rh_rois_Digit.niml.dset'];
+Outputs.cmdlbl = cmdlbl;
+Outputs.lbl =       {'Dp-Da_math'};
+Outputs.script =    ['cmd_' cmdlbl '_3dttest++.txt'];
+Outputs.output =    [cmdlbl '_3dttest++.nii.gz'];
+
+% Inputs
+Inputs.covars =   [topdir '/Covariates/covars_Nuisance.txt'];
+Inputs.covarlbl = 'nuisance';
+Inputs.sublist =  ''; %Empty uses all subjects
+Inputs.blur = '0';%'0 2 6 6 8'; % Get outputs for each level of smoothing
+Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset']};     
+Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset']};
+
+% RUN THE TTEST PIPELINE
+NFA_group_level_TDI_ttest(Inputs,Outputs);
+
     %% LH - Letter vs Letter Region Projection Ends Contrast - from Pollack&Price19 ROIs
     % Condition label
     cmdlbl = 'Digit-Letter_TDI_ends_surf_lh_6mm_log+c';
