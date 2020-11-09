@@ -2,6 +2,23 @@
 purge
 out_dir = '/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations';
 
+%% ROIs
+start_dir = '/Volumes/NBL_Projects/Price_NFA/NFA_fMRI/ProcessedData';
+cd(start_dir)
+
+f = [start_dir '/*_proc/*.freesurfer/SUMA/std.141.lh.PollackandPrice19_Lp-La.MNI152.votc.inflated.14mm_diam.1.1D'];
+make_mean_and_catenate_1D(f,out_dir)
+f = [start_dir '/*_proc/*.freesurfer/SUMA/std.141.lh.PollackandPrice19_Dp-Da.MNI152.votc.inflated.14mm_diam.1.1D'];
+make_mean_and_catenate_1D(f,out_dir)
+f = [start_dir '/*_proc/*.freesurfer/SUMA/std.141.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.1.1D'];
+make_mean_and_catenate_1D(f,out_dir)
+f = [start_dir '/*_proc/*.freesurfer/SUMA/std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.1.1D'];
+make_mean_and_catenate_1D(f,out_dir)
+f = [start_dir '/*_proc/*.freesurfer/SUMA/std.60.lh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam.1.1D'];
+make_mean_and_catenate_1D(f,out_dir)
+f = [start_dir '/*_proc/*.freesurfer/SUMA/std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.1.1D'];
+make_mean_and_catenate_1D(f,out_dir)
+
 %% Activation
 % Get the activation coefficients and tstats datasets
 start_dir = '/Volumes/NBL_Projects/Price_NFA/NFA_fMRI/ProcessedData';
@@ -101,7 +118,33 @@ for ii = 1:numel(hemi)
     make_mean_and_catenate(f,out_dir)
 end
 
-%% Global Function
+%% Global Functions
+function make_mean_and_catenate_1D(f,out_dir)
+    % First convert all the 1D files to niml
+    files = dir(f);
+    for ff = 1:numel(files)
+        in = files(ff).name;
+        in_dir = files(ff).folder;
+        output = strrep(files(ff).name,'.1.1D','');
+        cd(in_dir)
+        if contains(f,'std.60.')
+            unix(['ConvertDset -o_niml -pad_to_node ld60'...
+                ' -input ' in ' -prefix ' output ' -node_index_1D ' in '[0]']);
+        else
+            unix(['ConvertDset -o_niml -pad_to_node ld141'...
+                ' -input ' in ' -prefix ' output ' -node_index_1D ' in '[0]']);
+        end
+    end
+    f = strrep(f,'.1.1D','.niml.dset');
+    out = strsplit(f,'/');
+    out = out{end};
+    out = strrep(out,'_*_','_');
+    out = strrep(out,'.1*.','_');
+    out = strrep(out,'*.','');
+    unix(['3dMean -non_zero -overwrite -prefix ' out_dir '/GroupMean_' out ' ' f]);
+    unix(['3dTcat -overwrite -prefix ' out_dir '/AllSubs_' out ' ' f]);
+end
+
 function make_mean_and_catenate(f,out_dir)
     out = strsplit(f,'/');
     out = out{end};
@@ -111,3 +154,4 @@ function make_mean_and_catenate(f,out_dir)
     unix(['3dMean -non_zero -overwrite -prefix ' out_dir '/GroupMean_' out ' ' f]);
     unix(['3dTcat -overwrite -prefix ' out_dir '/AllSubs_' out ' ' f]);
 end
+
