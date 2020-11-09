@@ -7,6 +7,7 @@ cd(out_dir)
 label_coord_diam = {'LitCoord_Digit_Yeo17'        '55 -50 -12'  '7'
                     'LitCoord_Digit_Yeo17'        '-55 -50 -12' '5'
                     'LitCoord_Digit_Pollack19'    '54 -52 -14' '5'
+                    'LitCoord_Digit_Pollack19'    '54 -52 -14' '14'
                     'LitCoord_Digit_Shum17'       '51 -54 -12'  '5' 
                     'LitCoord_Letter_Thesen12'    '-40 -78 -18' '5'
                     'LitCoord_Digit_Grotheer18'   '57 -54 -17'  '5'
