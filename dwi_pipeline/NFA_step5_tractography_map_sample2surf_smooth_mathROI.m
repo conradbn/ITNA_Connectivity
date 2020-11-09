@@ -37,11 +37,12 @@ for ii = 1:numel(sub_dirs)
    
     % Set the local subject directory
     tmp_dir = [local_dir '/' sub];
-    
-    % Copy anatomical and anat2dwi transform from server
-    unix(['cp ' sub_dirs(ii).name '/PREPROCESSED/brain.finalsurfs_al2dwi.nii.gz ' tmp_dir]);
-    unix(['cp ' sub_dirs(ii).name '/PREPROCESSED/brain.finalsurfs_al2dwi_mat.aff12.1D ' tmp_dir]);
-         
+%     
+%     % Copy anatomical and anat2dwi transform from server
+%     unix(['cp ' sub_dirs(ii).name '/PREPROCESSED/brain.finalsurfs_al2dwi.nii.gz ' tmp_dir]);
+%     unix(['cp ' sub_dirs(ii).name '/PREPROCESSED/brain.finalsurfs_al2dwi_mat.aff12.1D ' tmp_dir]);
+      unix(['cp ' sub_dirs(ii).name '/PREPROCESSED/roi_PP19_MNI152/*math*binary_vol_al2dwi.nii.gz ' tmp_dir]);
+%          
     cd(tmp_dir);
     
     % Set some variables that will be used multiple times
@@ -51,11 +52,12 @@ for ii = 1:numel(sub_dirs)
     mu = load(['tracks_sift2_weights_ss3t_' sub '_50M_prop_coeff.txt']);
     
     %% Get streamlines that intersect each ROI
-    rois = dir('*binary_vol_al2dwi.nii.gz');
+%     rois = dir('*binary_vol_al2dwi.nii.gz');
+    rois = dir('*math*binary_vol_al2dwi.nii.gz');
     tck = ['tracks_ss3t_' sub '_50M.tck'];
     tck_weights = ['tracks_sift2_weights_ss3t_' sub '_50M.txt'];
     for jj = 1:numel(rois)
-        r = rois(jj).name(1:8);
+        r = rois(jj).name(1:13);%8
         if strcmp(r(1),'.') % Skip files starting with .
             continue
         else
@@ -63,14 +65,14 @@ for ii = 1:numel(sub_dirs)
             unix(['tckedit -force -ends_only ' tck...
                 ' -tck_weights_in ' tck_weights...
                 ' -tck_weights_out tracks_sift2_weights_ss3t_' sub '_50M_' r '.txt'...
-                ' -include ' r(1:8) '.binary_vol_al2dwi.nii.gz '...
-                ' tracks_ss3t_' sub '_50M_' r(1:8) '.tck']);
+                ' -include ' r '.binary_vol_al2dwi.nii.gz '...
+                ' tracks_ss3t_' sub '_50M_' r '.tck']);
         end
     end
     
     %% Create TDI (endpoint density) maps in subject native space for each ROI
     for jj = 1:numel(rois)
-        r = rois(jj).name(1:8);
+        r = rois(jj).name(1:13);%8
         if strcmp(r(1),'.') % Skip files starting with .
             continue
         else
@@ -106,59 +108,59 @@ for ii = 1:numel(sub_dirs)
     end
     
     %% Create wholebrain endpoint density map
-    tck = ['tracks_ss3t_' sub '_50M'];
-    tck_weights = ['tracks_sift2_weights_ss3t_' sub '_50M.txt'];
-    unix(['tckmap -force -ends_only -backtrack'...
-        ' -template brain.finalsurfs_al2dwi.nii.gz'...
-        '  -tck_weights_in ' tck_weights...
-        ' ' tck '.tck'...
-        ' ' tck '.wholebrain_TDI_ends.nii']);
-    
-    % Scale by the subject-specific proportionality coefficient (mu)
-    unix(['3dcalc -overwrite -a ' tck '.wholebrain_TDI_ends.nii'...
-        ' -prefix ' tck '.wholebrain_TDI_ends.norm.nii'...
-        ' -expr "a* ' num2str(mu) '"']);
-    
-    % Transform to anatomical space (anat2dwi transform will be inverted)
-    in =  [tck '.wholebrain_TDI_ends.norm.nii'];
-    out = [tck '.wholebrain_TDI_ends.norm.al2anat.nii'];
-    transform_to_anat(affine_dwi,surfvol,in,out);
-    
-    % Transform to surface for each hemisphere smooth
-    hemi = {'lh','rh'};
-    for hh = 1:2
-        h = hemi{hh};
-        spec = [suma_dir '/std.141.' sub '_' h '.spec'];
-        parent = [tck '.wholebrain_TDI_ends.norm.al2anat.nii'];
-        out =    [tck '.wholebrain_TDI_ends.norm.al2anat.' h '.niml.dset'];
-        log_xform = 'yes';
-        sample2surf_and_smooth(surfvol,spec,parent,out,log_xform)
-    end
+%     tck = ['tracks_ss3t_' sub '_50M'];
+%     tck_weights = ['tracks_sift2_weights_ss3t_' sub '_50M.txt'];
+%     unix(['tckmap -force -ends_only -backtrack'...
+%         ' -template brain.finalsurfs_al2dwi.nii.gz'...
+%         '  -tck_weights_in ' tck_weights...
+%         ' ' tck '.tck'...
+%         ' ' tck '.wholebrain_TDI_ends.nii']);
+%     
+%     % Scale by the subject-specific proportionality coefficient (mu)
+%     unix(['3dcalc -overwrite -a ' tck '.wholebrain_TDI_ends.nii'...
+%         ' -prefix ' tck '.wholebrain_TDI_ends.norm.nii'...
+%         ' -expr "a* ' num2str(mu) '"']);
+%     
+%     % Transform to anatomical space (anat2dwi transform will be inverted)
+%     in =  [tck '.wholebrain_TDI_ends.norm.nii'];
+%     out = [tck '.wholebrain_TDI_ends.norm.al2anat.nii'];
+%     transform_to_anat(affine_dwi,surfvol,in,out);
+%     
+%     % Transform to surface for each hemisphere smooth
+%     hemi = {'lh','rh'};
+%     for hh = 1:2
+%         h = hemi{hh};
+%         spec = [suma_dir '/std.141.' sub '_' h '.spec'];
+%         parent = [tck '.wholebrain_TDI_ends.norm.al2anat.nii'];
+%         out =    [tck '.wholebrain_TDI_ends.norm.al2anat.' h '.niml.dset'];
+%         log_xform = 'yes';
+%         sample2surf_and_smooth(surfvol,spec,parent,out,log_xform)
+%     end
 
     %% Create wholebrain streamline length maps (at endpoint voxels only)
-    tck = ['tracks_ss3t_' sub '_50M'];
-    tck_weights = ['tracks_sift2_weights_ss3t_' sub '_50M.txt'];
-    unix(['tckmap -force -contrast length -stat_vox mean'...
-        ' -ends_only -backtrack'...
-        ' -template brain.finalsurfs_al2dwi.nii.gz'...
-        '  -tck_weights_in ' tck_weights...
-        ' ' tck '.tck'...
-        ' ' tck '.wholebrain_length_map.nii']);
-    
-    % Transform to anatomical space (anat2dwi transform will be inverted)
-    in =  [tck '.wholebrain_length_map.nii'];
-    out = [tck '.wholebrain_length_map.al2anat.nii'];
-    transform_to_anat(affine_dwi,surfvol,in,out);
-    
-    % Transform to surface for each hemisphere smooth
-    for hh = 1:2
-        h = hemi{hh};
-        spec = [suma_dir '/std.141.' sub '_' h '.spec'];
-        parent = [tck '.wholebrain_length_map.al2anat.nii'];
-        out =    [tck '.wholebrain_length_map.al2anat.' h '.niml.dset'];
-        log_xform = 'no';
-        sample2surf_and_smooth(surfvol,spec,parent,out,log_xform)
-    end
+%     tck = ['tracks_ss3t_' sub '_50M'];
+%     tck_weights = ['tracks_sift2_weights_ss3t_' sub '_50M.txt'];
+%     unix(['tckmap -force -contrast length -stat_vox mean'...
+%         ' -ends_only -backtrack'...
+%         ' -template brain.finalsurfs_al2dwi.nii.gz'...
+%         '  -tck_weights_in ' tck_weights...
+%         ' ' tck '.tck'...
+%         ' ' tck '.wholebrain_length_map.nii']);
+%     
+%     % Transform to anatomical space (anat2dwi transform will be inverted)
+%     in =  [tck '.wholebrain_length_map.nii'];
+%     out = [tck '.wholebrain_length_map.al2anat.nii'];
+%     transform_to_anat(affine_dwi,surfvol,in,out);
+%     
+%     % Transform to surface for each hemisphere smooth
+%     for hh = 1:2
+%         h = hemi{hh};
+%         spec = [suma_dir '/std.141.' sub '_' h '.spec'];
+%         parent = [tck '.wholebrain_length_map.al2anat.nii'];
+%         out =    [tck '.wholebrain_length_map.al2anat.' h '.niml.dset'];
+%         log_xform = 'no';
+%         sample2surf_and_smooth(surfvol,spec,parent,out,log_xform)
+%     end
     
     %% Create wholebrain target diversity maps
     % NO SOLUTION FOR THIS IDEA YET!
@@ -177,18 +179,18 @@ for ii = 1:numel(sub_dirs)
     % (@SUMA_renumber_FS)
     
     % Copy parcellation files we need
-    unix(['cp ' suma_dir '/aparc.a2009s+aseg_REN_gmrois.nii.gz ' tmp_dir]); 
-    unix(['cp ' suma_dir '/aparc.a2009s+aseg_REN_all.niml.lt ' tmp_dir]);
+%     unix(['cp ' suma_dir '/aparc.a2009s+aseg_REN_gmrois.nii.gz ' tmp_dir]); 
+%     unix(['cp ' suma_dir '/aparc.a2009s+aseg_REN_all.niml.lt ' tmp_dir]);
 
     % Transform parcellation to DWI space
-    unix(['3dAllineate -interp NN -1Dmatrix_apply ' affine_dwi...
-        ' -master ' surfvol...
-        ' -input aparc.a2009s+aseg_REN_gmrois.nii.gz'...
-        ' -prefix aparc.a2009s+aseg_REN_gmrois.al2dwi.nii.gz']);
+%     unix(['3dAllineate -interp NN -1Dmatrix_apply ' affine_dwi...
+%         ' -master ' surfvol...
+%         ' -input aparc.a2009s+aseg_REN_gmrois.nii.gz'...
+%         ' -prefix aparc.a2009s+aseg_REN_gmrois.al2dwi.nii.gz']);
     
     % Loop through ROIs
     for jj = 1:numel(rois)
-        r = rois(jj).name(1:8);
+        r = rois(jj).name(1:13);%8
         if strcmp(r(1),'.') % Skip files starting with .
             continue
         else

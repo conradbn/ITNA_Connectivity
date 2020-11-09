@@ -1,13 +1,21 @@
 purge
-MNI_dir = '/Users/benconrad/.afni/data/suma_MNI152_2009';
-out_dir = '/Users/benconrad/Documents/GitHub/NFA_Stucture_Function/roi_creation';
+% MNI_dir = '/Users/benconrad/.afni/data/suma_MNI152_2009';
+% out_dir = '/Users/benconrad/Documents/GitHub/NFA_Stucture_Function/roi_creation/rois';
+MNI_dir = '/Users/nbl_imac2/.afni/data/suma_MNI152_2009';
+out_dir = '/Users/nbl_imac2/Documents/GitHub/NFA_Stucture_Function/roi_creation/rois';
 cd(out_dir)
 
 % Set the coordinates, labels, and diameter of circlular ROI
 label_coord_diam = {'LitCoord_Digit_Yeo17'        '55 -50 -12'  '7'
                     'LitCoord_Digit_Yeo17'        '-55 -50 -12' '5'
+<<<<<<< HEAD
                     'LitCoord_Digit_Pollack19'    '54 -52 -14' '5'
                     'LitCoord_Digit_Pollack19'    '54 -52 -14' '14'
+=======
+                    'LitCoord_Digit_Pollack19'    '54 -52 -14' '14'
+                    'LitCoord_Digit_Pollack19'    '-57 -52 -11' '14'
+                    'LitCoord_Letter_Pollack19'   '-42 -64 -11' '14'
+>>>>>>> e046c1fe50233cfebb34bf7af964080b3f49b0e4
                     'LitCoord_Digit_Shum17'       '51 -54 -12'  '5' 
                     'LitCoord_Letter_Thesen12'    '-40 -78 -18' '5'
                     'LitCoord_Digit_Grotheer18'   '57 -54 -17'  '5'
@@ -16,11 +24,11 @@ label_coord_diam = {'LitCoord_Digit_Yeo17'        '55 -50 -12'  '7'
                     'LitCoord_Word_Thesen12'      '-46 -52 -20' '5'
                     'LitCoord_Word_Cohen04'       '-45 -57 -12' '5'
                     'LitCoord_Digit_Bugden18'     '55 -51 -11'  '5'
-                    'LitCoord_Digit_Bugden18'     '-53  -60 -9'  '5'
-                    'LitCoord_Digit_Abboud16'     '58  -46  -14' '5'};
+                    'LitCoord_Digit_Bugden18'     '-53 -60 -9'  '5'
+                    'LitCoord_Digit_Abboud16'     '58 -46 -14' '5'};
                 
                 
-mesh = '141';
+mesh = '60';%'141';
 
 % Loop through and write to text file
 for ii = 1:size(label_coord_diam,1)
@@ -28,6 +36,7 @@ for ii = 1:size(label_coord_diam,1)
     c = label_coord_diam{ii,2};
     d = label_coord_diam{ii,3};
     out = [l '_' strrep(c,' ','_')];
+    out = [out '_std.' mesh];
 
     % Find the closest node to coordinate
     unix(['Surf2VolCoord -LPI'...
@@ -62,6 +71,4 @@ for ii = 1:size(label_coord_diam,1)
           ' -roi_labels ' out_dir '/' out '_label.txt'...
           ' -prefix ' out_dir '/' out '.inflated.' d 'mm_diam']);
     cd(out_dir);
-    
-    
 end
