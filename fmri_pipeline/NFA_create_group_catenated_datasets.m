@@ -141,8 +141,17 @@ function make_mean_and_catenate_1D(f,out_dir)
     out = strrep(out,'_*_','_');
     out = strrep(out,'.1*.','_');
     out = strrep(out,'*.','');
-    unix(['3dMean -non_zero -overwrite -prefix ' out_dir '/GroupMean_' out ' ' f]);
-    unix(['3dTcat -overwrite -prefix ' out_dir '/AllSubs_' out ' ' f]);
+    
+    % Specify the path to each individual file because not working with
+    % simpler wildcard expansion (perhaps also due to brik index selection "[1]")
+    files = dir(f);
+    full_path_set = [];
+    for ff = 1:numel(files)
+        full_path_set = [full_path_set ' ' files(ff).folder '/' files(ff).name '[1]'];
+    end
+    
+    unix(['3dMean -overwrite -prefix ' out_dir '/GroupMean_' out ' ' full_path_set]);
+    unix(['3dTcat -overwrite -prefix ' out_dir '/AllSubs_' out ' ' full_path_set]);
 end
 
 function make_mean_and_catenate(f,out_dir)
