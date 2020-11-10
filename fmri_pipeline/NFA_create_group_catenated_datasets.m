@@ -118,6 +118,23 @@ for ii = 1:numel(hemi)
     make_mean_and_catenate(f,out_dir)
 end
 
+
+%% Structural connectivity matrices (FreeSurfer ROIxROI)
+start_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface';
+cd(start_dir)
+f = ['*/tracks_ss3t_*_50M_Dp-Da.lh.fingerprint.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Lp-La.lh.fingerprint.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Dp-Da_math.rh.fingerprint.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Dp-Da.lh.fingerprint.norm.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Lp-La.lh.fingerprint.norm.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Dp-Da_math.rh.fingerprint.norm.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+
 %% Global Functions
 function make_mean_and_catenate_1D(f,out_dir)
     % First convert all the 1D files to niml
@@ -164,3 +181,20 @@ function make_mean_and_catenate(f,out_dir)
     unix(['3dTcat -overwrite -prefix ' out_dir '/AllSubs_' out ' ' f]);
 end
 
+function make_mean_and_catenate_matrices(f,out_dir)
+    files = dir(f);
+    for ff = 1:numel(files)
+        try 
+            mats(:,ff) = readmatrix([files(ff).folder '/' files(ff).name],'NumHeaderLines',1);
+        catch
+            mats(:,ff) = readmatrix([files(ff).folder '/' files(ff).name]);
+        end
+    end
+    out = strsplit(f,'/');
+    out = out{end};
+    out = strrep(out,'_*_','_');
+    out = strrep(out,'.1*.','_');
+    out = strrep(out,'*.','');
+    writematrix(mats,[out_dir '/AllSubs_' out]);
+    writematrix(mean(mats,2),[out_dir '/GroupMean_' out]);
+end
