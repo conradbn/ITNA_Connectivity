@@ -287,9 +287,9 @@ afni_niml_writesimple(Tval_map_sig_01,'../Results/FConn_lh_vs_rh_Dp_Tvals_FDR_p0
 Predictor_Map = {'FConn_Dig_Zmap_Dp_lh_2D' '../GroupMean_dsets/GroupMean_stats_lh_REML_Tstat_Dp.niml.dset'
                  'FConn_Dig_Zmap_Dp_rh_2D' '../GroupMean_dsets/GroupMean_stats_rh_REML_Tstat_Dp.niml.dset'
                  'SConn_Dig_lh_2D'         '../GroupMean_dsets/GroupMean_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
-                 'SConn_Dig_rh_2D'         '../GroupMean_dsets/GroupMean_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'};
+                 'SConn_Dig_rh_2D'         '../GroupMean_dsets/GroupMean_tracks_ss3t_50M_Dp-Da.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'};
               
-for ii = 4%1:numel(Predictor_Map)
+for ii = 1:numel(Predictor_Map)
     disp(num2str(ii));
     P = Maps.(Predictor_Map{ii,1});
     parfor jj = 1:size(P,1)
@@ -310,14 +310,13 @@ for ii = 4%1:numel(Predictor_Map)
             StatsP(jj) = L.Coefficients.pValue(ind);
         end
     end
-    StatsOut = [];
     StatsOut(:,1) = StatsC';
     StatsOut(:,2) = StatsT';
     StatsOut(:,3) = StatsP';
     % Save to surface niml file
     S = afni_niml_readsimple(Predictor_Map{ii,2});
     S.data = StatsOut;
-    afni_niml_writesimple(S,['../Results/LinMdl_Dp-Da_x_' Predictor_Map{ii,1} '.niml.dset']);
+    afni_niml_writesimple(S,['../Results/LinMdl_Dp-Da_x_' Predictor_Map{ii,1}]);
 end
 
 
