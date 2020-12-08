@@ -81,6 +81,22 @@ data_spec_roi = {'Coeff_Dp_Da_Dig_rh'   'Dig_rh_60'     'AllSubs_stats_rh_REML_C
                  'Coeff_Lp_La_Dig_lh'   'Dig_lh_60'     'AllSubs_stats_lh_REML_Coeff_Lp-La.niml.dset'
                  'Tstat_Lp_La_Dig_rh'   'Dig_rh_60'     'AllSubs_stats_rh_REML_Tstat_Lp-La.niml.dset'
                  'Tstat_Lp_La_Dig_lh'   'Dig_lh_60'     'AllSubs_stats_lh_REML_Tstat_Lp-La.niml.dset'
+                 'Coeff_Dp_Dig_rh'      'Dig_rh_60'     'AllSubs_stats_rh_REML_Coeff_Dp.niml.dset'
+                 'Coeff_Dp_Dig_lh'      'Dig_lh_60'     'AllSubs_stats_lh_REML_Coeff_Dp.niml.dset'
+                 'Tstat_Dp_Dig_rh'      'Dig_rh_60'     'AllSubs_stats_rh_REML_Tstat_Dp.niml.dset'
+                 'Tstat_Dp_Dig_lh'      'Dig_lh_60'     'AllSubs_stats_lh_REML_Tstat_Dp.niml.dset'
+                 'Coeff_Da_Dig_rh'      'Dig_rh_60'     'AllSubs_stats_rh_REML_Coeff_Da.niml.dset'
+                 'Coeff_Da_Dig_lh'      'Dig_lh_60'     'AllSubs_stats_lh_REML_Coeff_Da.niml.dset'
+                 'Tstat_Da_Dig_rh'      'Dig_rh_60'     'AllSubs_stats_rh_REML_Tstat_Da.niml.dset'
+                 'Tstat_Da_Dig_lh'      'Dig_lh_60'     'AllSubs_stats_lh_REML_Tstat_Da.niml.dset'
+                 'Coeff_Lp_Dig_rh'      'Dig_rh_60'     'AllSubs_stats_rh_REML_Coeff_Lp.niml.dset'
+                 'Coeff_Lp_Dig_lh'      'Dig_lh_60'     'AllSubs_stats_lh_REML_Coeff_Lp.niml.dset'
+                 'Tstat_Lp_Dig_rh'      'Dig_rh_60'     'AllSubs_stats_rh_REML_Tstat_Lp.niml.dset'
+                 'Tstat_Lp_Dig_lh'      'Dig_lh_60'     'AllSubs_stats_lh_REML_Tstat_Lp.niml.dset'
+                 'Coeff_La_Dig_rh'      'Dig_rh_60'     'AllSubs_stats_rh_REML_Coeff_La.niml.dset'
+                 'Coeff_La_Dig_lh'      'Dig_lh_60'     'AllSubs_stats_lh_REML_Coeff_La.niml.dset'
+                 'Tstat_La_Dig_rh'      'Dig_rh_60'     'AllSubs_stats_rh_REML_Tstat_La.niml.dset'
+                 'Tstat_La_Dig_lh'      'Dig_lh_60'     'AllSubs_stats_lh_REML_Tstat_La.niml.dset'
                  'Dens_Dig_lh'          'Dig_lh_141'    'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.log.niml.dset'
                  'Leng_Dig_lh'          'Dig_lh_141'    'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.lh.6mm.niml.dset'
                  'Dens_Dig_rh'          'Dig_rh_141'    'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.rh.6mm.log.niml.dset'
@@ -128,7 +144,7 @@ for ii = 1:size(data_spec_map,1)
      Maps.(l) = ds.data;
 end
 
-%% Run Vector-Map Correlations of Interest
+%% Run Vector-Map Brain-Behavior Correlations of Interest
 % % Specify data to extract
 %                   % Vector         % Map                         % NuisanceVars
 % data_spec_corr = {'calc_skills_ss' 'SConn_Dig_lh_2D'             'AgeMonths,female,BrainSegVolNotVent' 
@@ -284,26 +300,31 @@ afni_niml_writesimple(Tval_map_sig_01,'../Results/FConn_lh_vs_rh_Dp_Tvals_FDR_p0
 % Separate models for Structural and Functional connectivity
 % Covariates - Age, Sex, Brain Volume, Lp-La
                 % Table Variable           % Example file from which to adopt structure
-Predictor_Map = {'FConn_Dig_Zmap_Dp_lh_2D' '../GroupMean_dsets/GroupMean_stats_lh_REML_Tstat_Dp.niml.dset'
-                 'FConn_Dig_Zmap_Dp_rh_2D' '../GroupMean_dsets/GroupMean_stats_rh_REML_Tstat_Dp.niml.dset'
-                 'SConn_Dig_lh_2D'         '../GroupMean_dsets/GroupMean_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
-                 'SConn_Dig_rh_2D'         '../GroupMean_dsets/GroupMean_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'};
-              
-for ii = 4%1:numel(Predictor_Map)
+Predictor_Map = {'FConn_Dig_Zmap_Dp_lh_2D'     '../GroupMean_dsets/GroupMean_stats_lh_REML_Tstat_Dp.niml.dset'
+                 'FConn_Dig_Zmap_Dp_rh_2D'     '../GroupMean_dsets/GroupMean_stats_rh_REML_Tstat_Dp.niml.dset'
+                 'FConn_Dig_Zdiff_Dp_Da_lh_2D' '../GroupMean_dsets/GroupMean_stats_lh_REML_Tstat_Dp.niml.dset'
+                 'FConn_Dig_Zdiff_Dp_Da_rh_2D' '../GroupMean_dsets/GroupMean_stats_rh_REML_Tstat_Dp.niml.dset'
+                 'SConn_Dig_lh_2D'             '../GroupMean_dsets/GroupMean_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
+                 'SConn_Dig_rh_2D'             '../GroupMean_dsets/GroupMean_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'};
+             
+for ii = 1:size(Predictor_Map,1)
     disp(num2str(ii));
     P = Maps.(Predictor_Map{ii,1});
+    StatsC = [];
+    StatsT = [];
+    StatsP = [];
     parfor jj = 1:size(P,1)
         Ttmp = T;
         Ttmp.Node_Conn = P(jj,:)';
         % Run linear modelling and save coefficients, tstats, and pvalues
-        if contains(Predictor_Map{ii},'lh')
-            L = fitlm(Ttmp,'Tstat_Dp_Da_Dig_lh ~ Node_Conn + AgeMonths + female + BrainSegVolNotVent + Tstat_Lp_La_Dig_lh');
+        if contains(Predictor_Map{ii,1},'lh')
+            L = fitlm(Ttmp,'Coeff_Dp_Da_Dig_lh ~ Node_Conn + AgeMonths + female + BrainSegVolNotVent');
             ind = strcmp(L.CoefficientNames,'Node_Conn');
             StatsC(jj) = L.Coefficients.Estimate(ind);
             StatsT(jj) = L.Coefficients.tStat(ind);
             StatsP(jj) = L.Coefficients.pValue(ind);
-        elseif contains(Predictor_Map{ii},'rh')
-            L = fitlm(Ttmp,'Tstat_Dp_Da_Dig_rh ~ Node_Conn + AgeMonths + female + BrainSegVolNotVent + Tstat_Lp_La_Dig_rh');
+        elseif contains(Predictor_Map{ii,1},'rh')
+            L = fitlm(Ttmp,'Coeff_Dp_Da_Dig_rh ~ Node_Conn + AgeMonths + female + BrainSegVolNotVent');
             ind = strcmp(L.CoefficientNames,'Node_Conn');
             StatsC(jj) = L.Coefficients.Estimate(ind);
             StatsT(jj) = L.Coefficients.tStat(ind);
@@ -317,7 +338,7 @@ for ii = 4%1:numel(Predictor_Map)
     % Save to surface niml file
     S = afni_niml_readsimple(Predictor_Map{ii,2});
     S.data = StatsOut;
-    afni_niml_writesimple(S,['../Results/LinMdl_Dp-Da_x_' Predictor_Map{ii,1} '.niml.dset']);
+    afni_niml_writesimple(S,['../Results/LinMdl_Dp-Da_Coeff_NOLETTERCONTROL_x_' Predictor_Map{ii,1} '.niml.dset']);
 end
 
 
