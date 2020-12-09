@@ -1,5 +1,5 @@
 # ITNA_Connectivity
-This is a repository for my "Inferior Temporal Numeral Area Connectivity" project under Dr. Gavin Price. We look at structural and functional connectivity of this area (which has been shown to preferentially process numerals compared to other symbols) using streamline tractography (white-matter projections) and beta-series correlations (task-evoked coupling). We further assess the extent to which connectivity of this region relates to its functional selectivity (within a digit/letter detection task).
+This is a repository for my "Inferior Temporal Numeral Area" (ITNA) connectivity project under Dr. Gavin Price. We look at structural and functional connectivity of this area (which has been shown to preferentially process numerals compared to other symbols) using streamline tractography (white-matter projections) and beta-series correlations (task-evoked coupling). We further assess the extent to which connectivity of this region relates to its functional selectivity (within a digit/letter detection task).
 
 The repo contains the collection of MATLAB scripts/functions used for preprocessing both the fMRI and DWI data, as well as pipelines for structural and functional connectivity, statistical analyses, and figure generation.
 
