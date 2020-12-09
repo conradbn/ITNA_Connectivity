@@ -1,4 +1,4 @@
-function NFA_dwi_full_process_pipeline(sub_name,job_dir_path,group_proc_dir)
+function ITNA_step1_dwi_full_process_pipeline(sub_name,job_dir_path,group_proc_dir)
 %% NFA DWI Full Process Pipeline (using SynB0-DISCO generated B0 image)
 % This script runs the preprocessing for Price NFA DWI data using FSL's
 % eddy tool via a pipeline by Justin Blaber of CCI/Masilab. Instead of B0

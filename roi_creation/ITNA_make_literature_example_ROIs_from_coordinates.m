@@ -8,14 +8,10 @@ cd(out_dir)
 % Set the coordinates, labels, and diameter of circlular ROI
 label_coord_diam = {'LitCoord_Digit_Yeo17'        '55 -50 -12'  '7'
                     'LitCoord_Digit_Yeo17'        '-55 -50 -12' '5'
-<<<<<<< HEAD
                     'LitCoord_Digit_Pollack19'    '54 -52 -14' '5'
-                    'LitCoord_Digit_Pollack19'    '54 -52 -14' '14'
-=======
                     'LitCoord_Digit_Pollack19'    '54 -52 -14' '14'
                     'LitCoord_Digit_Pollack19'    '-57 -52 -11' '14'
                     'LitCoord_Letter_Pollack19'   '-42 -64 -11' '14'
->>>>>>> e046c1fe50233cfebb34bf7af964080b3f49b0e4
                     'LitCoord_Digit_Shum17'       '51 -54 -12'  '5' 
                     'LitCoord_Letter_Thesen12'    '-40 -78 -18' '5'
                     'LitCoord_Digit_Grotheer18'   '57 -54 -17'  '5'

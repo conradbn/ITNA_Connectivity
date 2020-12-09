@@ -1,5 +1,5 @@
 %% Run Threshold-Free Cluster Enhancement (TFCE)
-function [tfce_ds] = NFA_run_TFCE(surf_ds,vertices,faces,niters,out,surf_ds_null)
+function [tfce_ds] = ITNA_run_TFCE(surf_ds,vertices,faces,niters,out,surf_ds_null)
     % All data is prepared; surf_ds has 8 samples and 5124 nodes. We want to
     % see if there are clusters that show a significant difference from zero in
     % their response. Thus, .sa.targets is set to all ones (the same

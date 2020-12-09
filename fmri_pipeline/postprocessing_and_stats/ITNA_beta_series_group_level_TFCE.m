@@ -401,7 +401,7 @@ else
 end
 
 % Run TFCE
-[~] = NFA_run_TFCE(surf_ds,vertices,faces,niters,out,surf_dset_null);
+[~] = ITNA_run_TFCE(surf_ds,vertices,faces,niters,out,surf_dset_null);
 
 end
 

@@ -25,28 +25,28 @@ for ss = 1:numel(sub_dirs)
     
     % LD141 surface spec
     spec = ['std.141.' s '_lh.spec'];
-%     % Digit ROI
-%     roi = ['std.141.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.1.1D'];
-%     out = ['std.141.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam'];
-%     sample_surf_roi_to_vol(roi,out,spec,mset,sA,sB,'1D_ld141')
-%     % Letter ROI
-%     roi = ['std.141.lh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam.1.1D'];
-%     out = ['std.141.lh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam'];
-%     sample_surf_roi_to_vol(roi,out,spec,mset,sA,sB,'1D_ld141')
+    % Digit ROI
+    roi = ['std.141.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.1.1D'];
+    out = ['std.141.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam'];
+    sample_surf_roi_to_vol(roi,out,spec,mset,sA,sB,'1D_ld141')
+    % Letter ROI
+    roi = ['std.141.lh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam.1.1D'];
+    out = ['std.141.lh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam'];
+    sample_surf_roi_to_vol(roi,out,spec,mset,sA,sB,'1D_ld141')
     
     
     % LD141 surface spec
     spec = ['std.141.' s '_rh.spec'];
     % Set mask data (cortical ribbon)
     mset = ['rh.ribbon.nii'];
-%     % Digit ROI RH
-%     roi = ['std.141.rh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.1.1D'];
-%     out = ['std.141.rh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam'];
-%     sample_surf_roi_to_vol(roi,out,spec,mset,sA,sB,'1D_ld141')
-%     % Letter ROI RH
-%     roi = ['std.141.rh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam.1.1D'];
-%     out = ['std.141.rh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam'];
-%     sample_surf_roi_to_vol(roi,out,spec,mset,sA,sB,'1D_ld141')
+    % Digit ROI RH
+    roi = ['std.141.rh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.1.1D'];
+    out = ['std.141.rh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam'];
+    sample_surf_roi_to_vol(roi,out,spec,mset,sA,sB,'1D_ld141')
+    % Letter ROI RH
+    roi = ['std.141.rh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam.1.1D'];
+    out = ['std.141.rh.PP19_Lp-La.MNI152.votc.inflated.14mm_diam'];
+    sample_surf_roi_to_vol(roi,out,spec,mset,sA,sB,'1D_ld141')
     % Digit ROI RH - MATH
     roi = ['std.141.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.1.1D'];
     out = ['std.141.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam'];

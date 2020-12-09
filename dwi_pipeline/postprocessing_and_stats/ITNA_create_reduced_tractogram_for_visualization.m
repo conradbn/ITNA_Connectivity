@@ -4,7 +4,7 @@ purge
 cd('/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface/');
 subs = dir('1*');
 num_out = '200k'; 
-for ii = 24% 1:numel(subs)
+for ii = 1:numel(subs)
     sub = subs(ii).name;
     cd(sub);
     unix(['tckedit -number ' num_out...

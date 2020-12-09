@@ -1,4 +1,4 @@
-function [] = NFA_group_level_TDI_ttest(Inputs,Outputs)
+function [] = ITNA_group_level_TDI_ttest(Inputs,Outputs)
 
 %% Set variables
 % Start logging
