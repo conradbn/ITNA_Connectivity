@@ -1,12 +1,11 @@
-function ITNA_step1_dwi_full_process_pipeline(sub_name,job_dir_path,group_proc_dir)
-%% NFA DWI Full Process Pipeline (using SynB0-DISCO generated B0 image)
-% This script runs the preprocessing for Price NFA DWI data using FSL's
+function ITNA_step1_dwi_full_preprocess_pipeline(sub_name,job_dir_path,group_proc_dir)
+%% NFA DWI Full Preprocess Pipeline (using SynB0-DISCO generated B0 image)
+% This script runs the preprocessing for Price ITNA DWI data using FSL's
 % eddy tool via a pipeline by Justin Blaber of CCI/Masilab. Instead of B0
 % fieldmap, here we use a synthetic B0 image which is corrected for
 % distortion (using machine learning and the T1 image, via SynB0-Disco) as
 % input into topup. The eddy outputs are then furthered processed to
 % prepare for analysis in MRTrix3. 
-% 10/2/2019
 
 tic
 
