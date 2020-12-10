@@ -29,7 +29,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.lh.TDI_ends.norm.al2ana
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
 %% RH - Digit Region Projection Ends - from Pollack&Price19 ROIs
 % Condition label
@@ -51,7 +51,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.rh.TDI_ends.norm.al2ana
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.rh.TDI_ends.norm.al2anat.lh.6mm.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
 %% LH - Letter Region Projection Ends - from Pollack&Price19 ROIs
 % Condition label
@@ -73,7 +73,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.lh.TDI_ends.norm.al2ana
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
 %% RH - Letter Region Projection Ends - from Pollack&Price19 ROIs
 % Condition label
@@ -95,7 +95,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2ana
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2anat.lh.6mm.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
 
 %% LH - Digit Region Projection Ends - from Pollack&Price19 ROIs
@@ -116,7 +116,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.lh.TDI_ends.norm.al2ana
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
 %% RH - Digit Region Projection Ends - from Pollack&Price19 ROIs
 % Condition label
@@ -138,7 +138,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.rh.TDI_ends.norm.al2ana
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
 %% LH - Letter Region Projection Ends - from Pollack&Price19 ROIs
 % Condition label
@@ -160,7 +160,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.lh.TDI_ends.norm.al2ana
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
 %% RH - Letter Region Projection Ends - from Pollack&Price19 ROIs
 % Condition label
@@ -182,7 +182,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2ana
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
 
 %% RH - Math Region Projection Ends - from Pollack&Price19 ROIs
@@ -205,7 +205,7 @@ Inputs.data1 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da_math.rh.TDI_ends.norm.a
 Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset']};
 
 % RUN THE TTEST PIPELINE
-NFA_group_level_TDI_ttest(Inputs,Outputs);
+ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
     %% LH - Letter vs Letter Region Projection Ends Contrast - from Pollack&Price19 ROIs
     % Condition label
@@ -228,7 +228,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
                        [topdir '/1*/tracks_ss3t_*_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset']};
 
     % RUN THE TTEST PIPELINE
-    NFA_group_level_TDI_ttest(Inputs,Outputs);
+    ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
     %% RH - Digit vs Letter Region Projection Ends Contrast - from Pollack&Price19 ROIs
     % Condition label
@@ -251,7 +251,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
                        [topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset']};
 
     % RUN THE TTEST PIPELINE
-    NFA_group_level_TDI_ttest(Inputs,Outputs);
+    ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
         %% LH - Digit Projections x Woodcock Johnson Math scores - from Pollack&Price19 ROIs
         covariates = {'Calc' 'Fluency' 'CalcSkills'};
@@ -275,7 +275,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset']};
 
             % RUN THE TTEST PIPELINE
-            NFA_group_level_TDI_ttest(Inputs,Outputs);
+            ITNA_group_level_TDI_ttest(Inputs,Outputs);
         end
 
         %% RH - Digit Projections x Woodcock Johnson Math scores - from Pollack&Price19 ROIs
@@ -301,7 +301,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset']};
 
             % RUN THE TTEST PIPELINE
-            NFA_group_level_TDI_ttest(Inputs,Outputs);
+            ITNA_group_level_TDI_ttest(Inputs,Outputs);
         end
         
         %% LH - Letter Projections x Letter Word ID - from Pollack&Price19 ROIs
@@ -326,7 +326,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset']};
 
             % RUN THE TTEST PIPELINE
-            NFA_group_level_TDI_ttest(Inputs,Outputs);
+            ITNA_group_level_TDI_ttest(Inputs,Outputs);
         end
 
         %% RH - Letter Projections x Letter Word ID - from Pollack&Price19 ROIs
@@ -351,7 +351,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
             Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset']};
 
             % RUN THE TTEST PIPELINE
-            NFA_group_level_TDI_ttest(Inputs,Outputs);
+            ITNA_group_level_TDI_ttest(Inputs,Outputs);
         end
 
 
@@ -376,7 +376,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
                                        [topdir '/1*/tracks_ss3t_*_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset']};
 
                     % RUN THE TTEST PIPELINE
-                    NFA_group_level_TDI_ttest(Inputs,Outputs);
+                    ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
                     %% RH - Digit vs Letter Region Projection Ends Contrast - from Pollack&Price19 ROIs
                     % Condition label
@@ -399,7 +399,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
                                        [topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2anat.lh.6mm.niml.dset']};
 
                     % RUN THE TTEST PIPELINE
-                    NFA_group_level_TDI_ttest(Inputs,Outputs);
+                    ITNA_group_level_TDI_ttest(Inputs,Outputs);
 
                         %% LH - Digit Projections x Woodcock Johnson Math scores - from Pollack&Price19 ROIs
                         covariates = {'Calc' 'Fluency' 'CalcSkills'};
@@ -423,7 +423,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
                             Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset']};
 
                             % RUN THE TTEST PIPELINE
-                            NFA_group_level_TDI_ttest(Inputs,Outputs);
+                            ITNA_group_level_TDI_ttest(Inputs,Outputs);
                         end
 
                         %% RH - Digit Projections x Woodcock Johnson Math scores - from Pollack&Price19 ROIs
@@ -448,7 +448,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
                             Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Dp-Da.rh.TDI_ends.norm.al2anat.lh.6mm.niml.dset']};
 
                             % RUN THE TTEST PIPELINE
-                            NFA_group_level_TDI_ttest(Inputs,Outputs);
+                            ITNA_group_level_TDI_ttest(Inputs,Outputs);
                         end
 
                         %% LH - Letter Projections x Letter Word ID - from Pollack&Price19 ROIs
@@ -473,7 +473,7 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
                             Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset']};
 
                             % RUN THE TTEST PIPELINE
-                            NFA_group_level_TDI_ttest(Inputs,Outputs);
+                            ITNA_group_level_TDI_ttest(Inputs,Outputs);
                         end
 
                         %% RH - Letter Projections x Letter Word ID - from Pollack&Price19 ROIs
@@ -498,5 +498,5 @@ NFA_group_level_TDI_ttest(Inputs,Outputs);
                             Inputs.data2 =     {[topdir '/1*/tracks_ss3t_*_50M_Lp-La.rh.TDI_ends.norm.al2anat.lh.6mm.niml.dset']};
 
                             % RUN THE TTEST PIPELINE
-                            NFA_group_level_TDI_ttest(Inputs,Outputs);
+                            ITNA_group_level_TDI_ttest(Inputs,Outputs);
                         end

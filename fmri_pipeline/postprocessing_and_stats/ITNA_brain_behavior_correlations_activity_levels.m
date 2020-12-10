@@ -166,8 +166,8 @@ end
 % % end
 
 %% Seed-seed Structural connectivity matrices and contrast of LH vs RH
-Mats.SConn_Dig_lh_1D = readmatrix('AllSubs_tracks_ss3t_50M_Dp-Da.lh.fingerprint.norm.csv');
-Mats.SConn_Dig_rh_1D = readmatrix('AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.fingerprint.norm.csv');
+Mats.SConn_Dig_lh_1D = readmatrix('AllSubs_tracks_ss3t_50M_Dp-Da.lh.fingerprint.scalevol.norm.csv');
+Mats.SConn_Dig_rh_1D = readmatrix('AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.fingerprint.scalevol.norm.csv');
 lut = readmatrix('aparc.a2009s+aseg_REN_all.niml.lt','FileType','text','Range','6:202','OutputType','char');
 
 % Get unique region names
@@ -206,7 +206,7 @@ end
 
 
 % Write Tvalue map
-afni_niml_writesimple(Tval_map,'../Results/SConn_lh_vs_rh_Tvals.niml.dset')
+afni_niml_writesimple(Tval_map,'../Results/SConn_lh_vs_rh_scalevol_Tvals.niml.dset')
 
 % BH FDR correction
 Mats.Pvals_FDR = mafdr(Mats.Pvals,'BHFDR',true);
@@ -229,8 +229,8 @@ for ii = 1:numel(ctx_rois)
     end
 end
 
-afni_niml_writesimple(Tval_map_sig_05,'../Results/SConn_lh_vs_rh_Tvals_FDR_p05.niml.dset')
-afni_niml_writesimple(Tval_map_sig_01,'../Results/SConn_lh_vs_rh_Tvals_FDR_p01.niml.dset')
+afni_niml_writesimple(Tval_map_sig_05,'../Results/SConn_lh_vs_rh_scalevol_Tvals_FDR_p05.niml.dset')
+afni_niml_writesimple(Tval_map_sig_01,'../Results/SConn_lh_vs_rh_scalevol_Tvals_FDR_p01.niml.dset')
 
 
 %% Seed-seed Functional connectivity matrices and contrast of LH vs RH

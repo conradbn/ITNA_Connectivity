@@ -1,4 +1,4 @@
-%% NFA Structure Function Project
+%% ITNA Connectivity Project
 % Beta-series correlations - Seed to wholebrain
 
 purge
@@ -6,7 +6,7 @@ dir_start = '/Volumes/NBL_Projects/Price_NFA/NFA_fMRI/ProcessedData/';
 cd(dir_start);
 fnames = dir('*_proc');
 
-seed = {'Dp-Da' 'Lp-La'};
+seed = {'Dp-Da' 'Lp-La'}; % Math ROI 'Dp-Da_math' run separately
 hemi = {'lh' 'rh'};
 
 % For each subject

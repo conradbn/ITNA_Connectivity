@@ -37,6 +37,6 @@ sigma = median(outdata(:,1))
 Niters = median(outdata(:,2))
 
 %% Save to file
-%save('surface_smoothing_parameters_to_6mm_fwhm')
-save('surface_smoothing_parameters_to_4mm_fwhm')
+save('surface_smoothing_parameters_to_6mm_fwhm')
+%save('surface_smoothing_parameters_to_4mm_fwhm')
 

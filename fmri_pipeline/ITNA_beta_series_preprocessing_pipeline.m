@@ -1,4 +1,4 @@
-%% NFA Structure Function Project
+%% ITNA Connectivity Project - Beta Series Correlation Preprocessing
 % Surface-based Beta-series preprocessing pipeline 
 % Uses an afni_proc script, starting from raw data to make the code more
 % concise and reproducible. Discard intermediate volumetric data since it
