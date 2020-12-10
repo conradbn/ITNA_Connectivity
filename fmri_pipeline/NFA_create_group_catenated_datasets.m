@@ -134,6 +134,18 @@ f = ['*/tracks_ss3t_*_50M_Lp-La.lh.fingerprint.norm.csv'];
 make_mean_and_catenate_matrices(f,out_dir)
 f = ['*/tracks_ss3t_*_50M_Dp-Da_math.rh.fingerprint.norm.csv'];
 make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Dp-Da.lh.fingerprint.scalevol.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Lp-La.lh.fingerprint.scalevol.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Dp-Da_math.rh.fingerprint.scalevol.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Dp-Da.lh.fingerprint.scalevol.norm.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Lp-La.lh.fingerprint.scalevol.norm.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
+f = ['*/tracks_ss3t_*_50M_Dp-Da_math.rh.fingerprint.scalevol.norm.csv'];
+make_mean_and_catenate_matrices(f,out_dir)
 
 %% Global Functions
 function make_mean_and_catenate_1D(f,out_dir)
