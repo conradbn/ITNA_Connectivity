@@ -14,8 +14,8 @@ ctx_rois = cellfun(@(S) S(8:end), ctx, 'Uniform', 0);
 ctx_rois = unique(ctx_rois);
 ctx_rois(contains(ctx_rois,'Unknown')) = [];
 
-hemi = {'lh','rh'};
-dens = {'60','141'};
+hemi = {'lh','rh'}; %{'lh','rh'};
+dens = {'60'}; %{'60','141'};
 
 
 for hh = 1:numel(hemi)
@@ -33,7 +33,7 @@ for dd = 1:numel(dens)
     center_node_table = table();
     parfor ii = 1:numel(ctx_rois)
         
-        disp(['hemi-' h ' density-' d ' roi # ' num2str(ii) ' of ' numel(ctx_rois)]);
+        disp(['hemi-' h ' density-' d ' roi # ' num2str(ii) ' of ' num2str(numel(ctx_rois))]);
         % Load the node information
         c = ctx_rois{ii};
         roi_label = ['ctx_' h '_' c];
@@ -44,13 +44,13 @@ for dd = 1:numel(dens)
         % Get the nodes from that ROI and find all uniqure pairings
         roi_nodes = FS_nodes(FS_rois == id);
         out=nchoosek(roi_nodes,2);
-        writematrix(out,'tmp_node_pairs.txt');
+        writematrix(out,['tmp_node_pairs_' num2str(ii) '.txt']);
 
         % Get distance for every pair
-        unix(['SurfDist -i std.' d '.' h '.smoothwm.gii -input tmp_node_pairs.txt > tmp_dists.1D']);
+        unix(['SurfDist -i std.' d '.' h '.smoothwm.gii -input tmp_node_pairs_' num2str(ii) '.txt > tmp_dists_' num2str(ii) '.1D']);
 
         % Load distances
-        dists = readmatrix('tmp_dists.1D','FileType','text');
+        dists = readmatrix(['tmp_dists_' num2str(ii) '.1D'],'FileType','text');
         dist_sum = [];
         for jj = 1:numel(roi_nodes)
             r = roi_nodes(jj);
@@ -73,5 +73,6 @@ for dd = 1:numel(dens)
         center_node_table(ii,:) = tmpT;
     end
     writetable(center_node_table,['FS_ROI_centers_' h '_' d '.txt'],'Delimiter','tab');
+    unix('rm -f tmp*');
 end
 end
