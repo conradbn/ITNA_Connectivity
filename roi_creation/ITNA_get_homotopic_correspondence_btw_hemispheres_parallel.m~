@@ -73,10 +73,8 @@ for dd = 1:numel(dens)
         r_vecs(:,ii) = r(:,3);
     end
     
-    % Make single precision to reduce memory load
-    l_vecs = single(l_vecs);
-    r_vecs = single(r_vecs);
-    
+    l_vecs = single(l_vecs)
+    r_vecs = single(r_vecs):
     % Run Pearson correlation across vectors, creates an NxN matrix (N =
     % # of nodes)
     lr_similarity = corr(l_vecs',r_vecs');

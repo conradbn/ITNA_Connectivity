@@ -16,7 +16,7 @@ hemi = {'lh' 'rh'};
 dens = {'60'};
 
 for dd = 1:numel(dens)
-for hh = 1:numel(hemi)
+parfor hh = 1:numel(hemi)
     d = dens{dd};
     h = hemi{hh};
     C = readtable(['FS_ROI_centers_' h '_60.txt']);
