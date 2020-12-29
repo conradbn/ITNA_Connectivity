@@ -16,7 +16,7 @@ cd(fs_dir)
 hemi = {'lh' 'rh'};
 dens = {'141'}; % '60'
 
-out_dir = 'FS_node_to_ROI_distances';
+out_dir = [fs_dir '/FS_node_to_ROI_distances'];
 % mkdir(out_dir);
 
 for dd = 1:numel(dens)
@@ -50,7 +50,7 @@ end
 
 
 %% Now load the distances and find distance similarities
-dens = {'ld60','ld141'};
+dens = {'ld60'};%,'ld141'}
 cd(out_dir)
 for dd = 1:numel(dens)
     d = dens{dd};    
@@ -77,28 +77,143 @@ for dd = 1:numel(dens)
     % # of nodes)
     lr_similarity = corr(l_vecs',r_vecs');
     
-    % Find max rho for each node
+    % Find max rho in the left hemisphere for each node in right
     for ii = 1:size(lr_similarity,1)
-        lr_node_pairs(ii,1) = ii;
-        [~,lr_node_pairs(ii,2)] = max(lr_similarity(:,ii));
-    end
-
-    % Populate RH dataset based on corresponding LH node values
-    dset_lh.data = (1:length(dset_lh.node_indices))';
-    dset_rh.data(:) = 0;
-    for ii = 1:length(dset_lh.node_indices)
-        l = lr_node_pairs(ii,1);
-        r = lr_node_pairs(ii,2);
-        dset_rh.data(r,1) = l;
+        node_pairs_LtoR(ii,1) = ii;
+        node_pairs_RtoL(ii,2) = ii;
+        [~,node_pairs_LtoR(ii,2)] = max(lr_similarity(ii,:));
+        [~,node_pairs_RtoL(ii,1)] = max(lr_similarity(:,ii));
     end
     
+    % Populate the datasets
+    dset_lh.data = (1:length(dset_lh.node_indices))';
+    dset_rh.data = node_pairs_LtoR(:,2);
     % Write dsets based on homotopic correspondence. 
-    afni_niml_writesimple(dset_lh,['homotopic_correspondence_' d '_lh_.niml.dset']);
-    afni_niml_writesimple(dset_rh,['homotopic_correspondence_' d '_rh_.niml.dset']);
+    afni_niml_writesimple(dset_lh,['homotopic_correspondence_LtoR_' d '_lh.niml.dset']);
+    afni_niml_writesimple(dset_rh,['homotopic_correspondence_LtoR_' d '_rh.niml.dset']);
+
+    % Populate the datasets
+    dset_rh.data = (1:length(dset_rh.node_indices))';
+    dset_lh.data = node_pairs_RtoL(:,1);
+    % Write dsets based on homotopic correspondence. 
+    afni_niml_writesimple(dset_lh,['homotopic_correspondence_RtoL_' d '_lh.niml.dset']);
+    afni_niml_writesimple(dset_rh,['homotopic_correspondence_RtoL_' d '_rh.niml.dset']);
+
+    % Save node mappings (subtract 1 so the values correspond to 0-based
+    % node index used by AFNI/SUMA)
+    writematrix(node_pairs_LtoR-1,['homotopic_correspondence_LtoR_' d '.txt']);
+    writematrix(node_pairs_RtoL-1,['homotopic_correspondence_RtoL_' d '.txt']);
 end
     
-    
-    
+
+
+%% Map data from one surface to the other
+% NOTE - The order of the process depends
+
+clear all
+cd('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/AllSubs_dsets')
+
+% Load mapping files and add back 1 to account for 0-based index
+Lseed_Rtarg = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld60.txt');
+Ltarg_Rseed = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld60.txt');
+Lseed_Rtarg = Lseed_Rtarg+1;
+Ltarg_Rseed = Ltarg_Rseed+1;
+
+
+
+% ----- RH data to LH surface -----
+data = {'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.niml.dset'
+        'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset'
+        'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset'
+        'homotopic_correspondence_RtoL_ld60_rh.niml.dset'};
+for ii = 1:numel(data)
+    d = afni_niml_readsimple(data{ii});
+    dnew = d;
+    for kk = 1:size(d.data,2)
+    for jj = 1:numel(d.node_indices)
+       % Find all the seed nodes that mapped to this target
+       inds = find(Ltarg_Rseed(:,1) == jj);
+       if numel(inds) > 0
+           val = mean(d.data(inds,kk));
+       else
+       % If there were no seeds mapped to this target, base the data on
+       % this node's target
+           val = d.data(Lseed_Rtarg(jj,2),kk);
+       end
+       dnew.data(jj,kk) = val;
+    end
+    end
+    afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
+end
+
+
+
+% ----- LH data to RH surface -----
+data = {'AllSubs_std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.niml.dset'
+        'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
+        'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.Dp.niml.dset'
+        'homotopic_correspondence_LtoR_ld60_lh.niml.dset'};
+for ii = 1:numel(data)
+    d = afni_niml_readsimple(data{ii});
+    dnew = d;
+    for kk = 1:size(d.data,2)
+    for jj = 1:numel(d.node_indices)
+       % Find all the seed nodes that mapped to this target
+       inds = find(Lseed_Rtarg(:,2) == jj);
+       if numel(inds) > 0
+           val = mean(d.data(inds,kk));
+       else
+       % If there were no seeds mapped to this target, base the data on
+       % this node's target
+           val = d.data(Ltarg_Rseed(jj,1),kk);
+       end
+       dnew.data(jj,kk) = val;
+    end
+    end
+    afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
+end
+
+
+
+
+
+%% Verification
+% Confirmed that compared to previous iterations, the final method (v3)
+% yielded transformed distributions that were closest to original data
+%
+% v0 = afni_niml_readsimple('AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset');
+% v1 = afni_niml_readsimple('AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp_MAPPED2CONTRA.niml.dset');
+% v2 = afni_niml_readsimple('AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp_MAPPED2CONTRA_v2.niml.dset');
+% v3 = afni_niml_readsimple('AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp_MAPPED2CONTRA_v3.niml.dset');
+% 
+% for ii = 1:29
+%     [~,p(ii,1),kstat(ii,1)] = kstest2(v0.data(:,ii),v1.data(:,ii));
+%     [~,p(ii,2),kstat(ii,2)] = kstest2(v0.data(:,ii),v2.data(:,ii));
+%     [~,p(ii,3),kstat(ii,3)] = kstest2(v0.data(:,ii),v3.data(:,ii));
+% end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     
     
