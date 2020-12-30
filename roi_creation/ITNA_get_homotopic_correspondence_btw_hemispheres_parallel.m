@@ -77,18 +77,37 @@ for dd = 1:numel(dens)
     l_vecs = single(l_vecs);
     r_vecs = single(r_vecs);
     
-    % Run Pearson correlation across vectors, creates an NxN matrix (N =
-    % # of nodes)
-    lr_similarity = corr(l_vecs',r_vecs');
-    
-    % Find max rho in the left hemisphere for each node in right
-    for ii = 1:size(lr_similarity,1)
-        node_pairs_LtoR(ii,1) = ii;
-        node_pairs_RtoL(ii,2) = ii;
-        [~,node_pairs_LtoR(ii,2)] = max(lr_similarity(ii,:));
-        [~,node_pairs_RtoL(ii,1)] = max(lr_similarity(:,ii));
+    if strcmp(d,'ld60')
+        % Run Pearson correlation across vectors, creates an NxN matrix (N =
+        % # of nodes)
+        lr_similarity = corr(l_vecs',r_vecs');
+
+        % Find max rho in the left hemisphere for each node in right
+        for ii = 1:size(lr_similarity,1)
+            node_pairs_LtoR(ii,1) = ii;
+            node_pairs_RtoL(ii,2) = ii;
+            [~,node_pairs_LtoR(ii,2)] = max(lr_similarity(ii,:));
+            [~,node_pairs_RtoL(ii,1)] = max(lr_similarity(:,ii));
+        end
+    % For high density mesh, need to go one node at a time (i.e., can't hold a
+    % 199k x 199k correlation matrix in memory)
+    elseif strcmp(d,'ld141')
+        parfor ii = 1:size(l_vecs,1)
+            disp(['Working on node # ' num2str(ii)]);
+            col1_LtoR(ii,1) = ii;
+            col2_RtoL(ii,2) = ii;
+            nodeL = l_vecs(ii,:);
+            nodeR = r_vecs(ii,:);
+            corrLnode = corr(nodeL',r_vecs');
+            corrRnode = corr(nodeR',l_vecs');
+            [~,ind] = max(corrLnode);
+            [~,col2_LtoR(ii,1)] = max(corrLnode);
+            [~,col1_RtoL(ii,1)] = max(corrRnode);
+        end
+        node_pairs_LtoR = [col1_LtoR,col2_LtoR];
+        node_pairs_RtoL = [col1_RtoL,col2_RtoL];
     end
-    
+            
     % Populate the datasets
     dset_lh.data = (1:length(dset_lh.node_indices))';
     dset_rh.data = node_pairs_LtoR(:,2);
@@ -111,8 +130,7 @@ end
     
 
 
-%% Map data from one surface to the other
-% NOTE - The order of the process depends
+%% Map data from one surface to the other - ld60
 
 clear all
 cd('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/AllSubs_dsets')
@@ -122,7 +140,6 @@ Lseed_Rtarg = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations
 Ltarg_Rseed = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld60.txt');
 Lseed_Rtarg = Lseed_Rtarg+1;
 Ltarg_Rseed = Ltarg_Rseed+1;
-
 
 
 % ----- RH data to LH surface -----
@@ -151,7 +168,6 @@ for ii = 1:numel(data)
 end
 
 
-
 % ----- LH data to RH surface -----
 data = {'AllSubs_std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.niml.dset'
         'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
@@ -177,6 +193,68 @@ for ii = 1:numel(data)
     afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
 end
 
+        %% Map data from one surface to the other - ld141
+
+        clear all
+        cd('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/AllSubs_dsets')
+
+        % Load mapping files and add back 1 to account for 0-based index
+        Lseed_Rtarg = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld60.txt');
+        Ltarg_Rseed = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld60.txt');
+        Lseed_Rtarg = Lseed_Rtarg+1;
+        Ltarg_Rseed = Ltarg_Rseed+1;
+
+
+        % ----- RH data to LH surface -----
+        data = {'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.niml.dset'
+                'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset'
+                'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset'
+                'homotopic_correspondence_RtoL_ld60_rh.niml.dset'};
+        for ii = 1:numel(data)
+            d = afni_niml_readsimple(data{ii});
+            dnew = d;
+            for kk = 1:size(d.data,2)
+            for jj = 1:numel(d.node_indices)
+               % Find all the seed nodes that mapped to this target
+               inds = find(Ltarg_Rseed(:,1) == jj);
+               if numel(inds) > 0
+                   val = mean(d.data(inds,kk));
+               else
+               % If there were no seeds mapped to this target, base the data on
+               % this node's target
+                   val = d.data(Lseed_Rtarg(jj,2),kk);
+               end
+               dnew.data(jj,kk) = val;
+            end
+            end
+            afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
+        end
+
+
+        % ----- LH data to RH surface -----
+        data = {'AllSubs_std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.niml.dset'
+                'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
+                'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.Dp.niml.dset'
+                'homotopic_correspondence_LtoR_ld60_lh.niml.dset'};
+        for ii = 1:numel(data)
+            d = afni_niml_readsimple(data{ii});
+            dnew = d;
+            for kk = 1:size(d.data,2)
+            for jj = 1:numel(d.node_indices)
+               % Find all the seed nodes that mapped to this target
+               inds = find(Lseed_Rtarg(:,2) == jj);
+               if numel(inds) > 0
+                   val = mean(d.data(inds,kk));
+               else
+               % If there were no seeds mapped to this target, base the data on
+               % this node's target
+                   val = d.data(Ltarg_Rseed(jj,1),kk);
+               end
+               dnew.data(jj,kk) = val;
+            end
+            end
+            afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
+        end
 
 
 
