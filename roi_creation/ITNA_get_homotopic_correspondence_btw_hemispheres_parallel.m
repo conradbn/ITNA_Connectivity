@@ -54,7 +54,7 @@ dens = {'ld141'}; %'60'
 cd(out_dir)
 for dd = 1:numel(dens)
     d = dens{dd};    
-    % Load surface dsets to use as template
+    % Load example surface dsets to use as template
     if strcmp(d,'ld60')
         dset_lh = afni_niml_readsimple([fs_dir '/GroupMean_stats_lh_REML_Coeff_Dp.niml.dset']);
         dset_rh = afni_niml_readsimple([fs_dir '/GroupMean_stats_rh_REML_Coeff_Dp.niml.dset']);
@@ -127,176 +127,85 @@ for dd = 1:numel(dens)
     writematrix(node_pairs_LtoR-1,['homotopic_correspondence_LtoR_' d '.txt']);
     writematrix(node_pairs_RtoL-1,['homotopic_correspondence_RtoL_' d '.txt']);
 end
-    
 
-
-%% Map data from one surface to the other - ld60
-
+%% Map data to contralateral hemishperes
 clear all
 cd('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/AllSubs_dsets')
 
-% Load mapping files and add back 1 to account for 0-based index
-Lseed_Rtarg = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld60.txt');
-Ltarg_Rseed = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld60.txt');
-Lseed_Rtarg = Lseed_Rtarg+1;
-Ltarg_Rseed = Ltarg_Rseed+1;
-
-
-% ----- RH data to LH surface -----
-data = {'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.niml.dset'
-        'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset'
-        'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset'
-        'homotopic_correspondence_RtoL_ld60_rh.niml.dset'};
+% Set data files to map, including mesh density and mapping direction
+data = {'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.niml.dset'
+        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset'
+        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset'
+        'ld60'  'RtoL' 'homotopic_correspondence_RtoL_ld60_rh.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.Dp.niml.dset'
+        'ld60'  'LtoR' 'homotopic_correspondence_LtoR_ld60_lh.niml.dset'
+        'ld141' 'RtoL' 'Allsubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
+        'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset'
+        'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.rh.6mm.niml.dset'
+        'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.rh.6mm.niml.dset'
+        'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.rh.6mm.log.niml.dset'
+        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
+        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.lh.6mm.niml.dset'
+        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.log.niml.dset'};
+    
+% Loop through each dataset
 for ii = 1:numel(data)
-    d = afni_niml_readsimple(data{ii});
-    dnew = d;
-    for kk = 1:size(d.data,2)
-    for jj = 1:numel(d.node_indices)
-       % Find all the seed nodes that mapped to this target
-       inds = find(Ltarg_Rseed(:,1) == jj);
-       if numel(inds) > 0
-           val = mean(d.data(inds,kk));
-       else
-       % If there were no seeds mapped to this target, base the data on
-       % this node's target
-           val = d.data(Lseed_Rtarg(jj,2),kk);
-       end
-       dnew.data(jj,kk) = val;
+    % Load data structure
+    data_struct = afni_niml_readsimple(data{ii,3});
+    % Get mapping direction
+    direction = data{ii,2};
+    % Check which mesh density and load mapping files (add back 1 to
+    % account for 0-based index)
+    if strcmp(data{ii,1},'ld60')
+        Lseed_Rtarg = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld60.txt');
+        Ltarg_Rseed = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld60.txt');
+    elseif strcmp(data{ii,1},'ld141')
+        Lseed_Rtarg = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld141.txt');
+        Ltarg_Rseed = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld141.txt');
     end
-    end
-    afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
+    % Run the mapping function
+    data_struct.data = single(map_data(data_struct,Ltarg_Rseed,Lseed_Rtarg,direction));
+    % Write new data file
+    afni_niml_writesimple(data_struct,strrep(data{ii,3},'.niml.dset','_MAP2CON.niml.dset'));
 end
 
-
-% ----- LH data to RH surface -----
-data = {'AllSubs_std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.niml.dset'
-        'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
-        'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.Dp.niml.dset'
-        'homotopic_correspondence_LtoR_ld60_lh.niml.dset'};
-for ii = 1:numel(data)
-    d = afni_niml_readsimple(data{ii});
-    dnew = d;
-    for kk = 1:size(d.data,2)
-    for jj = 1:numel(d.node_indices)
-       % Find all the seed nodes that mapped to this target
-       inds = find(Lseed_Rtarg(:,2) == jj);
-       if numel(inds) > 0
-           val = mean(d.data(inds,kk));
-       else
-       % If there were no seeds mapped to this target, base the data on
-       % this node's target
-           val = d.data(Ltarg_Rseed(jj,1),kk);
-       end
-       dnew.data(jj,kk) = val;
+%% Mapping function
+function mapped_data = map_data(data_struct,LtRs,LsRt,direction)
+d = data_struct.data;
+mapped_data = zeros(size(d,1),size(d,2));
+for ss = 1:size(d,2) % Subjects/volumes
+    disp(['Mapping data (direction ' direction ') for Subject/Volume # ' num2str(ss)])
+    ds = d(:,ss);
+    mapped = zeros(size(d,1),1);
+    parfor nn = 1:size(d,1) % Nodes
+        if strcmp(direction,'RtoL')
+            % Find all the seed nodes that mapped to this target
+            inds = find(LtRs(:,1) == nn);
+            if numel(inds) > 0
+                val = mean(ds(inds));
+            else
+                % If there were no seeds mapped to this target, base the data on
+                % this node's target
+                val = ds(LsRt(nn,2));
+            end
+        elseif strcmp(direction,'LtoR')
+            % Find all the seed nodes that mapped to this target
+            inds = find(LsRt(:,2) == nn);
+            if numel(inds) > 0
+                val = mean(ds(inds));
+            else
+                % If there were no seeds mapped to this target, base the data on
+                % this node's target
+                val = ds(LtRs(nn,1));
+            end
+        end
+        mapped(nn,1) = val;
     end
-    end
-    afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
+    mapped_data(:,ss) = mapped;
 end
-
-        %% Map data from one surface to the other - ld141
-
-        clear all
-        cd('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/AllSubs_dsets')
-
-        % Load mapping files and add back 1 to account for 0-based index
-        Lseed_Rtarg = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld60.txt');
-        Ltarg_Rseed = readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld60.txt');
-        Lseed_Rtarg = Lseed_Rtarg+1;
-        Ltarg_Rseed = Ltarg_Rseed+1;
-
-
-        % ----- RH data to LH surface -----
-        data = {'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.niml.dset'
-                'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset'
-                'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset'
-                'homotopic_correspondence_RtoL_ld60_rh.niml.dset'};
-        for ii = 1:numel(data)
-            d = afni_niml_readsimple(data{ii});
-            dnew = d;
-            for kk = 1:size(d.data,2)
-            for jj = 1:numel(d.node_indices)
-               % Find all the seed nodes that mapped to this target
-               inds = find(Ltarg_Rseed(:,1) == jj);
-               if numel(inds) > 0
-                   val = mean(d.data(inds,kk));
-               else
-               % If there were no seeds mapped to this target, base the data on
-               % this node's target
-                   val = d.data(Lseed_Rtarg(jj,2),kk);
-               end
-               dnew.data(jj,kk) = val;
-            end
-            end
-            afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
-        end
-
-
-        % ----- LH data to RH surface -----
-        data = {'AllSubs_std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.niml.dset'
-                'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
-                'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.Dp.niml.dset'
-                'homotopic_correspondence_LtoR_ld60_lh.niml.dset'};
-        for ii = 1:numel(data)
-            d = afni_niml_readsimple(data{ii});
-            dnew = d;
-            for kk = 1:size(d.data,2)
-            for jj = 1:numel(d.node_indices)
-               % Find all the seed nodes that mapped to this target
-               inds = find(Lseed_Rtarg(:,2) == jj);
-               if numel(inds) > 0
-                   val = mean(d.data(inds,kk));
-               else
-               % If there were no seeds mapped to this target, base the data on
-               % this node's target
-                   val = d.data(Ltarg_Rseed(jj,1),kk);
-               end
-               dnew.data(jj,kk) = val;
-            end
-            end
-            afni_niml_writesimple(dnew,strrep(data{ii},'.niml.dset','_MAPPED2CONTRA.niml.dset'));
-        end
-
-
-
-
-%% Verification
-% Confirmed that compared to previous iterations, the final method (v3)
-% yielded transformed distributions that were closest to original data
-%
-% v0 = afni_niml_readsimple('AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset');
-% v1 = afni_niml_readsimple('AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp_MAPPED2CONTRA.niml.dset');
-% v2 = afni_niml_readsimple('AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp_MAPPED2CONTRA_v2.niml.dset');
-% v3 = afni_niml_readsimple('AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp_MAPPED2CONTRA_v3.niml.dset');
-% 
-% for ii = 1:29
-%     [~,p(ii,1),kstat(ii,1)] = kstest2(v0.data(:,ii),v1.data(:,ii));
-%     [~,p(ii,2),kstat(ii,2)] = kstest2(v0.data(:,ii),v2.data(:,ii));
-%     [~,p(ii,3),kstat(ii,3)] = kstest2(v0.data(:,ii),v3.data(:,ii));
-% end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
+end
+              
