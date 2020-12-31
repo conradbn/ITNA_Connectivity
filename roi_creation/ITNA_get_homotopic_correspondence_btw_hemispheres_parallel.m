@@ -95,7 +95,7 @@ for dd = 1:numel(dens)
         parfor ii = 1:size(l_vecs,1)
             disp(['Working on node # ' num2str(ii)]);
             col1_LtoR(ii,1) = ii;
-            col2_RtoL(ii,2) = ii;
+            col2_RtoL(ii,1) = ii;
             nodeL = l_vecs(ii,:);
             nodeR = r_vecs(ii,:);
             corrLnode = corr(nodeL',r_vecs');
