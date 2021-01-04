@@ -155,7 +155,7 @@ data = {'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.1
         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.log.niml.dset'};
     
 % Loop through each dataset
-for ii = 14:15%1:numel(data)
+for ii = 1:numel(data,1)
     % Load data structure
     data_struct = afni_niml_readsimple(data{ii,3});
     % Get mapping direction

@@ -1,8 +1,12 @@
+%% Make surface ROIs from MNI coordinates from literature
+% Finds closest surface node using the MNI152_2009 template surfaces, then
+% dilates around that node to specified diameter
+
 purge
 % MNI_dir = '/Users/benconrad/.afni/data/suma_MNI152_2009';
-% out_dir = '/Users/benconrad/Documents/GitHub/NFA_Stucture_Function/roi_creation/rois';
+% out_dir = '/Users/benconrad/Documents/GitHub/ITNA_Connectivity/roi_creation/rois';
 MNI_dir = '/Users/nbl_imac2/.afni/data/suma_MNI152_2009';
-out_dir = '/Users/nbl_imac2/Documents/GitHub/NFA_Stucture_Function/roi_creation/rois';
+out_dir = '/Users/nbl_imac2/Documents/GitHub/ITNA_Connectivity/roi_creation/rois';
 cd(out_dir)
 
 % Set the coordinates, labels, and diameter of circlular ROI
@@ -11,6 +15,7 @@ label_coord_diam = {'LitCoord_Digit_Yeo17'        '55 -50 -12'  '7'
                     'LitCoord_Digit_Pollack19'    '54 -52 -14' '5'
                     'LitCoord_Digit_Pollack19'    '54 -52 -14' '14'
                     'LitCoord_Digit_Pollack19'    '-57 -52 -11' '14'
+                    'LitCoord_Digit_Pollack19'    '-57 -52 -11' '5'
                     'LitCoord_Letter_Pollack19'   '-42 -64 -11' '14'
                     'LitCoord_Digit_Shum17'       '51 -54 -12'  '5' 
                     'LitCoord_Letter_Thesen12'    '-40 -78 -18' '5'
@@ -66,5 +71,15 @@ for ii = 1:size(label_coord_diam,1)
           ' -roi_nodes ' out_dir '/' out '_node.txt'... 
           ' -roi_labels ' out_dir '/' out '_label.txt'...
           ' -prefix ' out_dir '/' out '.inflated.' d 'mm_diam']);
+      
+    % Create niml version of ROI  
+    unix(['ConvertDset -overwrite -o_niml -pad_to_node ld' mesh...
+          ' -input ' out_dir '/' out '.inflated.' d 'mm_diam.1.1D'...
+          ' -node_index_1D ' out_dir '/' out '.inflated.' d 'mm_diam.1.1D[0]'...
+          ' -prefix ' out_dir '/' out '.inflated.' d 'mm_diam']);
     cd(out_dir);
 end
+
+
+
+
