@@ -1,9 +1,34 @@
-purge;
-cd('/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface/Group_Data')
-fnames = dir('all_subs*p-*a.*.TDI_ends.norm.al2anat.*.6mm.niml.dset');
+%% ITNA Consistency Thresholding procedure
+% Performs consistency-based thresholding to deal with false positives
+% inherent in tractography results. Provides masks used for later
+% statistical testing (i.e. only consider those nodes with reliable
+% projections to/from seed)  Method inspired by Roberts et al. 2017
+% (http://dx.doi.org/10.1016/j.neuroimage.2016.09.053)
 
+purge;
+cd('/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/AllSubs_dsets/')
+% Set the files on which to run thresholding (this thresholding is
+% performed on the raw TDI values before log transformation)
+fnames = {'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+          'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+          'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm_MAP2CON.niml.dset'
+          'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
+          'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm_MAP2CON.niml.dset'};
+      
+% Specify the ROIs to be used for masking      
+rois =  {'LitCoord_Digit_Pollack19_-57_-52_-11_std.141_lh.inflated.14mm_diam.niml.dset'
+         'LitCoord_Letter_Pollack19_-42_-64_-11_std.141_lh.inflated.14mm_diam.niml.dset'
+         'LitCoord_Digit_Pollack19_54_-52_-14_std.141_rh.inflated.14mm_diam_MAP2CON.niml.dset'
+         'LitCoord_Digit_Pollack19_54_-52_-14_std.141_rh.inflated.14mm_diam.niml.dset'
+         'LitCoord_Digit_Pollack19_-57_-52_-11_std.141_lh.inflated.14mm_diam_MAP2CON.niml.dset'};
+rois_use_list = [1,2,3;...
+                 1,2,3;...
+                 1,2,3;...
+                 4,5,NaN;...
+                 4,5,NaN];
+                
 % Set proportion to keep based on consistency
-prop_edges_keep = 0.005 ; % i.e. 0.30 = 30% density, based on edge consistency
+prop_edges_keep_all = [0.005,0.01,0.02,0.04,0.08,0.15,0.30];% i.e. 0.30 = 30% density, based on edge consistency
 
 % Set proportion of subjects required to have non-zero value.
 % This is important because 0 values will be converted to NaN, and thus
@@ -14,19 +39,46 @@ prop_edges_keep = 0.005 ; % i.e. 0.30 = 30% density, based on edge consistency
 % At least 90% of subjects need a nonzero value in this node (in this case, 26 of 29 subjects)
 prop_subs_nzero = 0.90;
 
-%% Loop through each of the values
+%% Loop through each of the files
 for ii = 1:numel(fnames)
-    % Load the catenated subject data
-    d = afni_niml_readsimple(fnames(ii).name);
-    Ws = d.data;
-    [W_thr,W_bin,W_log] = consistency_thresholding(Ws,prop_edges_keep,prop_subs_nzero);
-    % Write thresholded and binarized surface files
-    d.data = W_thr;
-    afni_niml_writesimple(d,['consistency.' num2str(prop_edges_keep) '.group_mean.' fnames(ii).name]);
-    d.data = W_bin;
-    afni_niml_writesimple(d,['consistency.' num2str(prop_edges_keep) '.group_mask.' fnames(ii).name]);
-    d.data = W_log.*W_bin;
-    afni_niml_writesimple(d,['consistency.' num2str(prop_edges_keep) '.group_mean.log.' fnames(ii).name]);
+    
+    % Loop through each threshold level
+    for pp = 1:numel(prop_edges_keep_all)
+        prop_edges_keep = prop_edges_keep_all(pp);
+        
+        % Load the catenated subject data
+        d = afni_niml_readsimple(fnames{ii});
+        Ws = d.data;
+        
+        % Mask the data with the ROIs so these nodes aren't considered in
+        % consistency calculation (note these nodes will also be excluded from
+        % later statistical testing)
+        masks = rois_use_list(ii,:);
+        for mm = 1:sum(~isnan(masks))
+            m = afni_niml_readsimple(['/Users/nbl_imac2/Documents/GitHub/ITNA_Connectivity/roi_creation/rois/' rois{masks(mm)}]);
+            Ws = Ws .* ~m.data(:,2);
+        end
+        
+        % Run the consistency thresholding process
+        [W_thr,W_bin,W_log] = consistency_thresholding(Ws,prop_edges_keep,prop_subs_nzero);
+        
+        % Write thresholded and binarized surface files
+        d.data = W_thr;
+        afni_niml_writesimple(d,['Consistency_Thresholding/consistency.' num2str(prop_edges_keep) '.group_mean.' fnames{ii}]);
+        d.data = W_bin;
+        afni_niml_writesimple(d,['Consistency_Thresholding/consistency.' num2str(prop_edges_keep) '.group_mask.' fnames{ii}]);
+    end
+    
+    % Make sum images (i.e. sum of binary masks at each threshold)
+    all_lvls = dir(['Consistency_Thresholding/consistency.0*group_mask*' fnames{ii}]);
+    dall = [];
+    for ll = 1:numel(all_lvls)
+        d = afni_niml_readsimple(['Consistency_Thresholding/' all_lvls(ll).name]);
+        dall(:,ll)=d.data;
+    end
+    d.data = nansum(dall,2);
+    afni_niml_writesimple(d,['Consistency_Thresholding/consistency.sum.group_mask.' fnames{ii}]);
+    
 end
 
 %% Global function
