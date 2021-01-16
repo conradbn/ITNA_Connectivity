@@ -63,9 +63,9 @@ start_dir = '/Volumes/NBL_Projects/Price_NFA/NFA_fMRI/ProcessedData';
 cd(start_dir)
 hemi = {'lh' 'rh'};  
 % Single conditions
-task_conds = {'Dp' 'Da' 'Lp' 'La'};
+task_conds = {'ALL' 'Dp' 'Da' 'Lp' 'La'};
 for ii = 1:numel(hemi)
-    for jj = 1:numel(task_conds)
+    for jj = 1%:numel(task_conds)
         t = task_conds{jj};
         h = hemi{ii};
         f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Zmap.' t '.niml.dset'];
@@ -77,20 +77,20 @@ for ii = 1:numel(hemi)
     end
 end
 
-% Condition contrasts
-task_conds = {'Dp-Da' 'Lp-La'};
-for ii = 1:numel(hemi)
-    for jj = 1:numel(task_conds)
-        t = task_conds{jj};
-        h = hemi{ii};
-        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
-        make_mean_and_catenate(f,out_dir)
-        f = [start_dir '/*_proc/*.beta_series/*.Lp-La.lh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
-        make_mean_and_catenate(f,out_dir)
-        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da_math.rh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
-        make_mean_and_catenate(f,out_dir)
-    end
-end
+% % Condition contrasts
+% task_conds = {'Dp-Da' 'Lp-La'};
+% for ii = 1:numel(hemi)
+%     for jj = 1:numel(task_conds)
+%         t = task_conds{jj};
+%         h = hemi{ii};
+%         f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
+%         make_mean_and_catenate(f,out_dir)
+%         f = [start_dir '/*_proc/*.beta_series/*.Lp-La.lh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
+%         make_mean_and_catenate(f,out_dir)
+%         f = [start_dir '/*_proc/*.beta_series/*.Dp-Da_math.rh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
+%         make_mean_and_catenate(f,out_dir)
+%     end
+% end
 
 %% Structural connectivity
 start_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface';
