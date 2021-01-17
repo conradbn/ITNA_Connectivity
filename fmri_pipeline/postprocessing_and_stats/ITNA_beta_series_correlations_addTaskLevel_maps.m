@@ -11,7 +11,7 @@ seed = {'Dp-Da' 'Lp-La' 'Dp-Da_math'};
 hemi = {'lh' 'rh'};
 
 % For each subject
-for sub = 1:numel(fnames)
+for sub = 2:numel(fnames)
     
     % Load the subject variables saved in workspace .mat file
     cd(dir_start)
@@ -78,13 +78,13 @@ for sub = 1:numel(fnames)
 %                 'Lp','La'};
     label = {'ALL_DTask' 'ALL_LTask'};
              
-    % For seeds in each hemisphere
-    for hh = 1:numel(hemi)
-        h = hemi{hh};
-        
-        % Read in the beta series dataset
-        betas = [dir_beta '/' subj '_' h '_LSS_betas.niml.dset'];
-        b = afni_niml_readsimple(betas);
+%     % For seeds in each hemisphere
+%     for hh = 1:numel(hemi)
+%         h = hemi{hh};
+%         
+%         % Read in the beta series dataset
+%         betas = [dir_beta '/' subj '_' h '_LSS_betas.niml.dset'];
+%         b = afni_niml_readsimple(betas);
         
         % For each seed ROI
         for ss = 1:numel(seed)
@@ -96,6 +96,11 @@ for sub = 1:numel(fnames)
             elseif strcmp(s,'Dp-Da_math')
                 h = 'rh';
             end
+            
+            % Read in the beta series dataset
+            betas = [dir_beta '/' subj '_' h '_LSS_betas.niml.dset'];
+            b = afni_niml_readsimple(betas);
+            
             % ***********************************************
             
             
@@ -143,29 +148,29 @@ for sub = 1:numel(fnames)
                     bcorr.data = atanh(bcorr.data);
                     afni_niml_writesimple(bcorr,[subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' e '.niml.dset']);
                     
-                    %% Null beta series correlations
-                    % Now create a null dataset based on random set of
-                    % betas for significance testing
-                    % Get the index for this event type
-                    events_all = find(events_censor ==0);
-                    % Set up new dataset
-                    bcorr_null = bcorr;
-                    for nn = 1:100
-                        idx_null = randperm(length(events_all),sum(idx));
-                        idx_null = events_all(idx_null);
-                        % Calculate correlation at every node
-                        bs_corr = corr(bs_seed(idx_null),b.data(:,idx_null)');
-                        bcorr_null.data(:,nn) = bs_corr';
-                    end
-                    afni_niml_writesimple(bcorr_null,[subj '.' s '.' h '.beta_series_corr.' hem '.Rmap.' e '_null.niml.dset']);
-                    % Fisher Z transform
-                    bcorr_null.data = atanh(bcorr_null.data);
-                    afni_niml_writesimple(bcorr_null,[subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' e '_null.niml.dset']);
-                     
-                    %% Baseline beta series correlations 
-                    % Now create mean connectivity map across ALL trials
-                    % and all OTHER trials
-                    % Only do the ALL trials map once
+%                     %% Null beta series correlations
+%                     % Now create a null dataset based on random set of
+%                     % betas for significance testing
+%                     % Get the index for this event type
+%                     events_all = find(events_censor ==0);
+%                     % Set up new dataset
+%                     bcorr_null = bcorr;
+%                     for nn = 1:100
+%                         idx_null = randperm(length(events_all),sum(idx));
+%                         idx_null = events_all(idx_null);
+%                         % Calculate correlation at every node
+%                         bs_corr = corr(bs_seed(idx_null),b.data(:,idx_null)');
+%                         bcorr_null.data(:,nn) = bs_corr';
+%                     end
+%                     afni_niml_writesimple(bcorr_null,[subj '.' s '.' h '.beta_series_corr.' hem '.Rmap.' e '_null.niml.dset']);
+%                     % Fisher Z transform
+%                     bcorr_null.data = atanh(bcorr_null.data);
+%                     afni_niml_writesimple(bcorr_null,[subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' e '_null.niml.dset']);
+%                      
+%                     %% Baseline beta series correlations 
+%                     % Now create mean connectivity map across ALL trials
+%                     % and all OTHER trials
+%                     % Only do the ALL trials map once
 %                     if ee == 1
 %                         % Get index for ALL trials (uncensored)
 %                         events_all = find(events_censor == 0);
@@ -235,5 +240,5 @@ for sub = 1:numel(fnames)
 %                 end
 %             end
         end
-    end
+    %end
 end

@@ -10,7 +10,7 @@
 
 purge
 
-fs_dir = '/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs';
+fs_dir = '/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/FreeSurfer_ROIs';
 cd(fs_dir)
 
 hemi = {'lh' 'rh'};
@@ -130,7 +130,7 @@ end
 
 %% Map data to contralateral hemishperes
 clear all
-cd('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/AllSubs_dsets')
+cd('/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/AllSubs_dsets')
 
 % Set data files to map, including mesh density and mapping direction
 data = {'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.niml.dset'
@@ -141,6 +141,11 @@ data = {'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.1
         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.Dp.niml.dset'
         'ld60'  'LtoR' 'homotopic_correspondence_LtoR_ld60_lh.niml.dset'
+        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.ALL.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL.niml.dset'
+        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.ALL_DTask.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL_DTask.niml.dset'
+        
         'ld141' 'RtoL' 'Allsubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
         'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset'
         'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.rh.6mm.niml.dset'
@@ -155,7 +160,7 @@ data = {'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.1
         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.log.niml.dset'};
     
 % Loop through each dataset
-for ii = 1:numel(data,1)
+for ii = 9:12% 1:numel(data,1)
     % Load data structure
     data_struct = afni_niml_readsimple(data{ii,3});
     % Get mapping direction
@@ -163,11 +168,11 @@ for ii = 1:numel(data,1)
     % Check which mesh density and load mapping files (add back 1 to
     % account for 0-based index)
     if strcmp(data{ii,1},'ld60')
-        Lseed_Rtarg = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld60.txt');
-        Ltarg_Rseed = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld60.txt');
+        Lseed_Rtarg = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld60.txt');
+        Ltarg_Rseed = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld60.txt');
     elseif strcmp(data{ii,1},'ld141')
-        Lseed_Rtarg = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld141.txt');
-        Ltarg_Rseed = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/BrainBehavCorrelations/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld141.txt');
+        Lseed_Rtarg = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/FreeSurfer_ROIs/homotopic_correspondence_LtoR_ld141.txt');
+        Ltarg_Rseed = 1 + readmatrix('/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/FreeSurfer_ROIs/homotopic_correspondence_RtoL_ld141.txt');
     end
     % Run the mapping function
     data_struct.data = single(map_data(data_struct,Ltarg_Rseed,Lseed_Rtarg,direction));
