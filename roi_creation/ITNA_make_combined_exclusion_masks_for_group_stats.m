@@ -2,7 +2,7 @@
 % Data within these masks would be excluded
 
 purge
-roi_dir = '/Users/nbl_imac2/Documents/GitHub/ITNA_Connectivity/roi_creation/rois';
+roi_dir = '/Users/benconrad/Documents/GitHub/ITNA_Connectivity/roi_creation/rois';
 cd(roi_dir)
 
 %% First get combination and then inverse of consistency threshold masks
@@ -34,6 +34,19 @@ label = 'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_DigLH_plus_DigRH.rh.
 afni_niml_writesimple(mout,label);
 mout.data = ~mout.data;
 afni_niml_writesimple(mout,['INV_' label]);
+
+%% Write the single ROI inverse maps (for masking the raw structural connectivity images)
+label = {'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+        'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+        'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'};
+for ii = 1:numel(label)
+    l = label{ii};
+    m1 = afni_niml_readsimple(l);
+    mout = m1;
+    mout.data = mout.data~=1;
+    afni_niml_writesimple(mout,['INV_' label{ii}]);
+end
+
 
 %% Now create combined masks for each density/contrast
 unix(['3dcalc -overwrite -prefix GroupMask_DigLH_DigRH_on_LHsurf_ld60.niml.dset'...

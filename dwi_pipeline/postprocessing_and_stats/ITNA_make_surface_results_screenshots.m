@@ -1,7 +1,7 @@
-%% Make vOTC Searchlight results screenshots
-% Use command line DriveSuma command to automatically start SUMA viewer
-% load surface ROIs, rotate as required, and generate image files for each
-% subject
+%% Make Screenshots of Final Connectivity Results
+% Use command line DriveSuma command to automatically start SUMA viewer,
+% load statistic datasets, load surface ROIs, rotate as required, and
+% generate image files for each contrast
 
 % NOTE - I was generating screenshots with DriveSuma in a Ubuntu 16.04 VM,
 % but it was inconvenient.To make this finally work in OSX (High Sierra,
@@ -18,7 +18,8 @@ purge;
 top_dir = '/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/Results'; 
 cd(top_dir);
 
-input_strings = {% Structural Connectivity Contrasts
+input_strings = {
+    % Structural Connectivity Contrasts
     'PairedTest_SC_DigLH_vs_LetLH_log+c','lh','ld141';...
     'PairedTest_SC_DigLH_vs_DigRH_log+c_on_LHsurf','lh','ld141';...
     'PairedTest_SC_DigLH_vs_DigRH_log+c_on_RHsurf','rh','ld141';...
@@ -57,7 +58,7 @@ for ii = 1:size(input_strings,1)
     cmap = 'coolwarm.niml.cmap';
     dimfac = '0.6';
     i_range = '4.26';
-    t_thresh = '1.96';
+    t_thresh = '-T_val 1.96';
     
     % Set mask dataset(s) based on label
     dset_mask = {};
@@ -84,6 +85,64 @@ for ii = 1:size(input_strings,1)
     % Create montage of all four views
     create_montage(label,hemi);
 end
+
+
+%% Create screenshots and montages for raw connectivity maps
+input_strings = {
+    % Structural Connectivity
+    'mask_PairedTest_SC_DigLH_vs_LetLH_log+c_SET1_MEAN.niml.dset','lh','ld141';...
+    'mask_PairedTest_SC_DigLH_vs_LetLH_log+c_SET2_MEAN.niml.dset','lh','ld141';...
+    'mask_PairedTest_SC_DigLH_vs_DigRH_log+c_on_RHsurf_SET2_MEAN.niml.dset','rh','ld141';...
+    'PairedTest_SC_DigLH_vs_LetLH_log+c_SET1_MEAN.niml.dset','lh','ld141';...
+    'PairedTest_SC_DigLH_vs_LetLH_log+c_SET2_MEAN.niml.dset','lh','ld141';...
+    'PairedTest_SC_DigLH_vs_DigRH_log+c_on_RHsurf_SET2_MEAN.niml.dset','rh','ld141';...
+    
+    % Functional Connectivity
+    'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_SET1_MEAN.niml.dset','lh','ld60';...
+    'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_SET2_MEAN.niml.dset','lh','ld60';...
+    'PairedTest_FC_ALL_DigLH_vs_DigRH_on_RHsurf_SET2_MEAN.niml.dset','rh','ld60'};
+
+for ii = 4:6%1:size(input_strings,1)
+    % Get inputs 
+    dset = input_strings{ii,1};
+    h = input_strings{ii,2};
+    d = input_strings{ii,3};
+    
+    % Set strings
+    label = strrep(dset,'.niml.dset','');
+    hemi = h;
+    mesh = strrep(d,'ld','');
+    cmap = 'rainbow.niml.cmap';
+    dimfac = '0.5';
+    
+    if contains(label,'SC')
+        i_range = '-7 -4';
+        t_thresh = '';
+    elseif contains(label,'FC')
+        i_range = '0 .5';
+        t_thresh = '-T_val 0.141';
+    end 
+    
+    % Set mask dataset(s) based on label
+    if contains(label,'DigLH') && contains(label,'SET1')
+       dset_mask = {['LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
+    elseif contains(label,'LetLH') && contains(label,'SET2')
+       dset_mask = {['LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
+    elseif contains(label,'DigRH') && contains(label,'SET2')
+       dset_mask = {['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']};
+    end
+    
+    % Call functions to create screenshots (first remove those that exist)
+    unix(['rm -f ' label '*.jpg & sleep 3']);
+    call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask);
+    % Crop whitespace from all images and make consistent size
+    unix(['mogrify -trim ' label '*.jpg & sleep 3']);
+    unix(['mogrify -resize 1000x1000 ' label '*.jpg & sleep 3']);
+    % Create montage of all four views
+    create_montage(label,hemi);
+end
+
+
 
 
 %% Global function to call SUMA
@@ -114,7 +173,7 @@ str = ['suma -spec /Users/benconrad/.afni/data/suma_MNI152_2009/std.' mesh '.MNI
 % Load the statistic dataset
 str = ['DriveSuma -com surf_cont -load_dset ' dset ...
       ' -load_cmap ' cmap ' -I_sb 0 -I_range ' i_range...
-      ' -T_sb 0 -T_val ' t_thresh ' -Dim ' dimfac ' -1_only n']; eval(addstr);
+      ' -T_sb 0 ' t_thresh ' -Dim ' dimfac ' -1_only n']; eval(addstr);
 
 % Check if 1 or 2 masks specified and load
 if numel(dset_mask) == 1
