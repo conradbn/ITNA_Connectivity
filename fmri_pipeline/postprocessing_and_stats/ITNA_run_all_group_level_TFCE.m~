@@ -157,7 +157,7 @@ cd(data_dir)
 niters = 100000; % Total number of iterations for TFCE
 test = 1; % All of the tests here are one-sample tests
 
-for ii = 1:size(input_strings,1)
+for ii = 1%1:size(input_strings,1)
     % Get the label for this test 
     label = [out_dir '/' input_strings{ii,1}];
     hemi = input_strings{ii,2};
@@ -218,14 +218,10 @@ for ii = 1:size(input_strings,1)
     
     % Create count map (to potentially use in place of TFCE result)
     ds = afni_niml_readsimple(in_dset);
-    ds.data = sum(ds.data,2)./size(ds.data,2);
-    ds_mask = afni_niml_readsimple(mask_dset);
-    ds.data = ds.data .* ds_mask.data;
-    out_count = [label '_ALLDATA_count.niml.dset'];
-    afni_niml_writesimple(ds,out_count);
+    ds.data = sum(
     
     % Call global function
-    setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
+    %setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
     
 end
     
