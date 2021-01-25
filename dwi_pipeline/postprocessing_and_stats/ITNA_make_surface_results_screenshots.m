@@ -102,7 +102,7 @@ input_strings = {
     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_SET2_MEAN.niml.dset','lh','ld60';...
     'PairedTest_FC_ALL_DigLH_vs_DigRH_on_RHsurf_SET2_MEAN.niml.dset','rh','ld60'};
 
-for ii = 4:6%1:size(input_strings,1)
+for ii = 1:size(input_strings,1)
     % Get inputs 
     dset = input_strings{ii,1};
     h = input_strings{ii,2};
@@ -130,6 +130,74 @@ for ii = 4:6%1:size(input_strings,1)
        dset_mask = {['LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
     elseif contains(label,'DigRH') && contains(label,'SET2')
        dset_mask = {['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']};
+    end
+    
+    % Call functions to create screenshots (first remove those that exist)
+    unix(['rm -f ' label '*.jpg & sleep 3']);
+    call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask);
+    % Crop whitespace from all images and make consistent size
+    unix(['mogrify -trim ' label '*.jpg & sleep 3']);
+    unix(['mogrify -resize 1000x1000 ' label '*.jpg & sleep 3']);
+    % Create montage of all four views
+    create_montage(label,hemi);
+end
+
+%% Create screenshots and montages for Conjunction results
+input_strings = {
+    % Structural Connectivity Contrasts
+    'PairedTest_SC_DigLH_CONJ_LetLH_log+c','lh','ld141';...
+    'PairedTest_SC_DigLH_CONJ_DigRH_log+c_on_LHsurf','lh','ld141';...
+    'PairedTest_SC_DigLH_CONJ_DigRH_log+c_on_RHsurf','rh','ld141';...
+
+    % Functional Connectivity Contrasts - Digit CONJ Letter
+    'PairedTest_FC_ALL_DigLH_CONJ_ALL_LetLH','lh','ld60';...
+    'PairedTest_FC_Dp_DigLH_CONJ_Da_DigLH','lh','ld60';...
+    'PairedTest_FC_Lp_LetLH_CONJ_La_LetLH','lh','ld60';...
+    'PairedTest_FC_Dp-Da_DigLH_CONJ_Lp-La_LetLH','lh','ld60';...
+
+    % Functional Connectivity Contrasts - Task-level        
+    'PairedTest_FC_DTask_DigLH_CONJ_LTask_DigLH','lh','ld60';...
+    'PairedTest_FC_DTask_LetLH_CONJ_LTask_LetLH','lh','ld60';...
+    'PairedTest_FC_Dp_DigLH_CONJ_Lp_DigLH','lh','ld60';... 
+    'PairedTest_FC_Dp_LetLH_CONJ_Lp_LetLH','lh','ld60';...
+          
+    % Functional Connectivity Contrasts - Digit L CONJ Digit R
+    'PairedTest_FC_ALL_DigLH_CONJ_DigRH_on_LHsurf','lh','ld60';...
+    'PairedTest_FC_ALL_DigLH_CONJ_DigRH_on_RHsurf','rh','ld60';...
+    'PairedTest_FC_Dp_DigRH_CONJ_Da_DigRH_on_RHsurf','rh','ld60';...
+    'PairedTest_FC_Dp-Da_DigLH_CONJ_DigRH_on_LHsurf','lh','ld60';...
+    'PairedTest_FC_Dp-Da_DigLH_CONJ_DigRH_on_RHsurf','rh','ld60'};
+
+for ii = 1:size(input_strings,1)
+    % Get inputs 
+    label = input_strings{ii,1};
+    dset = [label '_TFCE_Zscore_100000iters_MASK.niml.dset'];
+    h = input_strings{ii,2};
+    d = input_strings{ii,3};
+    
+    % Set strings
+    
+    hemi = h;
+    mesh = strrep(d,'ld','');
+    cmap = 'matter.niml.cmap';
+    dimfac = '1';
+    t_thresh = '-T_val 1.96';
+    i_range = '0 4.16';
+    
+    % Set mask dataset(s) based on label
+    dset_mask = {};
+    if contains(label,'DigLH') && strcmp(hemi,'lh')
+        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
+    elseif contains(label,'DigLH')
+        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam_MAP2CON.niml.dset']];
+    end
+    if contains(label,'DigRH') && strcmp(hemi,'lh')
+        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam_MAP2CON.niml.dset']];
+    elseif contains(label,'DigRH')
+        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']];
+    end
+    if  contains(label,'LetLH') 
+        dset_mask = [dset_mask,['LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
     end
     
     % Call functions to create screenshots (first remove those that exist)
