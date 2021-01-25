@@ -120,7 +120,7 @@ input_strings = {
 
 %% Loop through and run each contrast through TFCE
 cd(data_dir)
-for ii = 4:size(input_strings,1)
+for ii = 1:size(input_strings,1)
     % Get the label for this test 
     label = [out_dir '/' input_strings{ii,1}];
     hemi = input_strings{ii,2};
@@ -149,6 +149,28 @@ for ii = 4:size(input_strings,1)
     setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
 end
 
+
+%% Run conjunction analyses
+cd(data_dir)
+for ii = 1:size(input_strings,1)
+    % Get the label for this test 
+    label = [out_dir '/' input_strings{ii,1}];
+    hemi = input_strings{ii,2};
+    density = input_strings{ii,3};
+    mask_dset = input_strings{ii,4};
+    
+    % Change label to indicate conjunction
+    label = strrep(label,'vs','CONJ');
+    
+    % Threshold input data to proceed with conjunction
+    % Cutoff for functional data (FisherZ or Z-score of diff) is
+    % uncorrected p<0.005. For structural data will use cutoff of log10(-7)
+    
+    
+    
+end
+    
+    
 
 %% Global function
 function [] = setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)

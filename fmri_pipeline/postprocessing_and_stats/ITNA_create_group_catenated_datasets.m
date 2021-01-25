@@ -68,11 +68,25 @@ for ii = 1:numel(hemi)
     for jj = 1:numel(task_conds)
         t = task_conds{jj};
         h = hemi{ii};
+        % Fisher Z maps
         f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Zmap.' t '.niml.dset'];
         make_mean_and_catenate(f,out_dir)
         f = [start_dir '/*_proc/*.beta_series/*.Lp-La.lh.beta_series_corr.' h '.Zmap.' t '.niml.dset'];
         make_mean_and_catenate(f,out_dir)
         f = [start_dir '/*_proc/*.beta_series/*.Dp-Da_math.rh.beta_series_corr.' h '.Zmap.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        % P threshold maps
+        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Pval_thr005.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Lp-La.lh.beta_series_corr.' h '.Pval_thr005.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da_math.rh.beta_series_corr.' h '.Pval_thr005.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Pval_thr01.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Lp-La.lh.beta_series_corr.' h '.Pval_thr01.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da_math.rh.beta_series_corr.' h '.Pval_thr01.' t '.niml.dset'];
         make_mean_and_catenate(f,out_dir)
     end
 end
@@ -83,11 +97,25 @@ for ii = 1:numel(hemi)
     for jj = 1:numel(task_conds)
         t = task_conds{jj};
         h = hemi{ii};
+        % Correlation Difference maps (z-scores)
         f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
         make_mean_and_catenate(f,out_dir)
         f = [start_dir '/*_proc/*.beta_series/*.Lp-La.lh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
         make_mean_and_catenate(f,out_dir)
         f = [start_dir '/*_proc/*.beta_series/*.Dp-Da_math.rh.beta_series_corr.' h '.Zdiff.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        % P threshold maps
+        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Zdiff_Pval_thr005.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Lp-La.lh.beta_series_corr.' h '.Zdiff_Pval_thr005.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da_math.rh.beta_series_corr.' h '.Zdiff_Pval_thr005.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da.lh.beta_series_corr.' h '.Zdiff_Pval_thr01.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Lp-La.lh.beta_series_corr.' h '.Zdiff_Pval_thr01.' t '.niml.dset'];
+        make_mean_and_catenate(f,out_dir)
+        f = [start_dir '/*_proc/*.beta_series/*.Dp-Da_math.rh.beta_series_corr.' h '.Zdiff_Pval_thr01.' t '.niml.dset'];
         make_mean_and_catenate(f,out_dir)
     end
 end
@@ -189,7 +217,11 @@ function make_mean_and_catenate(f,out_dir)
     out = strrep(out,'_*_','_');
     out = strrep(out,'.1*.','_');
     out = strrep(out,'*.','');
-    unix(['3dMean -non_zero -overwrite -prefix ' out_dir '/GroupMean_' out ' ' f]);
+    if contains(f,'Pval_thr')
+        unix(['3dMean -overwrite -prefix ' out_dir '/GroupMean_' out ' ' f]);
+    else
+        unix(['3dMean -non_zero -overwrite -prefix ' out_dir '/GroupMean_' out ' ' f]);
+    end
     unix(['3dTcat -overwrite -prefix ' out_dir '/AllSubs_' out ' ' f]);
 end
 

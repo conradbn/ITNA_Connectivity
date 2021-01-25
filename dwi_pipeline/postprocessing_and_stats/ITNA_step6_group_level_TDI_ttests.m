@@ -1,4 +1,8 @@
 %% Group level statistical tests on TDI surface maps
+% NOTE - This uses AFNI-based statistical testing (e.g. 3dttest++). I have
+% since moved to using CosmoMVPA TFCE for stastical testing, as it performs
+% both the tests and the cluster correction simultaneously.
+
 % Setup and run each statistical test for the paper including: 
 % 1) seed to wholebrain connectivity
 % 2) connectivity contrasts

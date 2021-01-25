@@ -37,7 +37,11 @@ parfor ii = 1:numel(fnames)
         N = ecounts(3,1);
     elseif contains(f,'Rmap.Lp')
         N = ecounts(4,1);
-    elseif contains(f,'Rmap.ALL')
+    elseif contains(f,'Rmap.ALL_DTask')
+        N = ecounts(1,1) + ecounts(3,1)
+    elseif contains(f,'Rmap.ALL_LTask')
+        N = ecounts(1,2) + ecounts(4,1)
+    elseif contains(f,'Rmap.ALL.')
         N = sum(ecounts(1:4,1));
     end
     
