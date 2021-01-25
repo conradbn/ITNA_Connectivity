@@ -1,7 +1,5 @@
 %% Run Threshold Free Cluster Enhancement (TFCE) significance testing for all pairwise contrasts
 purge
-niters = 100000; % Total number of iterations for TFCE
-test = 2; % All of the tests here are paired two-sample tests
 data_dir = '/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/AllSubs_dsets';
 out_dir = '/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/Results';       
 
@@ -120,38 +118,45 @@ input_strings = {
 
 %% Loop through and run each contrast through TFCE
 cd(data_dir)
-for ii = 1:size(input_strings,1)
-    % Get the label for this test 
-    label = [out_dir '/' input_strings{ii,1}];
-    hemi = input_strings{ii,2};
-    density = input_strings{ii,3};
-    mask_dset = input_strings{ii,4};
-    
-    % Create mean datasets for inspection/visualizaton
-    unix(['3dTstat -mean -overwrite -prefix ' label '_SET1_MEAN '...
-        input_strings{ii,5}]);
-    unix(['3dTstat -mean -overwrite -prefix ' label '_SET2_MEAN '...
-        input_strings{ii,6}]);
-    
-    % Combine all data into one input file
-    unix(['3dTcat -overwrite -prefix ' label '_ALLDATA '...
-        input_strings{ii,5} ' ' input_strings{ii,6}]);
-    
-    in_dset = [label '_ALLDATA.niml.dset'];
-    
-    % Set filename for the output statistic dataset and number of iterations
-    out = [label '_TFCE_Zscore_' num2str(niters) 'iters_MASK.niml.dset'];
-    
-    % Specify no input null (i.e. use the program's default method)
-    out_dset_null = '';
-    
-    % Call global function
-    setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
-end
+niters = 100000; % Total number of iterations for TFCE
+test = 2; % All of the tests here are paired two-sample tests
+% for ii = 1:size(input_strings,1)
+%     % Get the label for this test 
+%     label = [out_dir '/' input_strings{ii,1}];
+%     hemi = input_strings{ii,2};
+%     density = input_strings{ii,3};
+%     mask_dset = input_strings{ii,4};
+%     
+%     % Create mean datasets for inspection/visualizaton
+%     unix(['3dTstat -mean -overwrite -prefix ' label '_SET1_MEAN '...
+%         input_strings{ii,5}]);
+%     unix(['3dTstat -mean -overwrite -prefix ' label '_SET2_MEAN '...
+%         input_strings{ii,6}]);
+%     
+%     % Combine all data into one input file
+%     unix(['3dTcat -overwrite -prefix ' label '_ALLDATA '...
+%         input_strings{ii,5} ' ' input_strings{ii,6}]);
+%     
+%     in_dset = [label '_ALLDATA.niml.dset'];
+%     
+%     % Set filename for the output statistic dataset and number of iterations
+%     out = [label '_TFCE_Zscore_' num2str(niters) 'iters_MASK.niml.dset'];
+%     
+%     % Specify no input null (i.e. use the program's default method)
+%     out_dset_null = '';
+%     
+%     % Call global function
+%     setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
+% end
 
 
 %% Run conjunction analyses
+% This takes all the paired contrasts, modifies their inputs, then runs the
+% conjunction on their thresholded overlap maps
 cd(data_dir)
+niters = 100000; % Total number of iterations for TFCE
+test = 1; % All of the tests here are one-sample tests
+
 for ii = 1:size(input_strings,1)
     % Get the label for this test 
     label = [out_dir '/' input_strings{ii,1}];
@@ -162,11 +167,51 @@ for ii = 1:size(input_strings,1)
     % Change label to indicate conjunction
     label = strrep(label,'vs','CONJ');
     
-    % Threshold input data to proceed with conjunction
-    % Cutoff for functional data (FisherZ or Z-score of diff) is
-    % uncorrected p<0.005. For structural data will use cutoff of log10(-7)
+    % Get thresholded data for input into conjunction TFCE (1-sample test
+    % on the overlap maps)
+    if contains(label,'PairedTest_SC')
+        % THrehsold stuctural connectivity maps
+        cutoff = -7;
+        thr_name1 = strrep(input_strings{ii,5},'.niml.dset','.thr-7.niml.dset');
+        ds = afni_niml_readsimple(input_strings{ii,5});
+        ds.data(ds.data > cutoff) = 1;
+        ds.data(ds.data <= cutoff) = 0;
+        afni_niml_writesimple(ds,thr_name1);
+        
+        thr_name2 = strrep(input_strings{ii,6},'.niml.dset','.thr-7.niml.dset');
+        ds = afni_niml_readsimple(input_strings{ii,6});
+        ds.data(ds.data > cutoff) = 1;
+        ds.data(ds.data <= cutoff) = 0;
+        afni_niml_writesimple(ds,thr_name2);
+    elseif contains(label,'PairedTest_FC') && contains(input_strings{ii,5},'Zmap')
+        thr_name1 = strrep(input_strings{ii,5},'Zmap','Pval_thr005');
+        thr_name2 = strrep(input_strings{ii,6},'Zmap','Pval_thr005');
+    elseif contains(label,'PairedTest_FC') && contains(input_strings{ii,5},'Zdiff')
+        thr_name1 = strrep(input_strings{ii,5},'Zdiff','Zdiff_Pval_thr01');
+        thr_name2 = strrep(input_strings{ii,6},'Zdiff','Zdiff_Pval_thr01');
+    end
     
+
+    % Create mean datasets for inspection/visualizaton
+    unix(['3dTstat -mean -overwrite -prefix ' label '_SET1_MEAN '...
+        thr_name1]);
+    unix(['3dTstat -mean -overwrite -prefix ' label '_SET2_MEAN '...
+        thr_name2]);
     
+    % Get subject-level overlap maps
+    unix(['3dcalc -overwrite -a ' thr_name1 ' -b ' thr_name2...
+         ' -prefix ' label '_ALLDATA -expr "and(a,b)"']); 
+        
+    in_dset = [label '_ALLDATA.niml.dset'];
+    
+    % Set filename for the output statistic dataset and number of iterations
+    out = [label '_TFCE_Zscore_' num2str(niters) 'iters_MASK.niml.dset'];
+    
+    % Specify no input null (i.e. use the program's default method)
+    out_dset_null = '';
+    
+    % Call global function
+    setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
     
 end
     
@@ -253,11 +298,12 @@ cosmo_map2surface(tstat_ds,out_uncT);
 X = surf_ds.samples(1:nsubs,:);
 Y = surf_ds.samples(nsubs+1:end,:);
 bf10_ds = tstat_ds;
-for nn = 1:size(X,2)
+parfor nn = 1:size(X,2)
     x = X(:,nn)';
     y = Y(:,nn)';
-    bf10_ds.samples(1,nn) = bf.ttest(x,y);
+    bf_xy(nn) = bf.ttest(x,y);   
 end
+bf10_ds.samples(1,:) = bf_xy;
 out_bf10 = strrep(out,'.niml.dset','_uncorrBF10.niml.dset');
 cosmo_map2surface(bf10_ds,out_bf10);
 

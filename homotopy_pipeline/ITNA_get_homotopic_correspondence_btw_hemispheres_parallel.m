@@ -146,6 +146,15 @@ data = {'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.1
         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.ALL_DTask.niml.dset'
         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL_DTask.niml.dset'
         
+        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff_Pval_thr01.Dp-Da.niml.dset'
+        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.Dp.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff_Pval_thr01.Dp-Da.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.Dp.niml.dset'
+        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.ALL.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.ALL.niml.dset'
+        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.ALL_DTask.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.ALL_DTask.niml.dset'
+        
         'ld141' 'RtoL' 'Allsubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
         'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset'
         'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.rh.6mm.niml.dset'
@@ -160,7 +169,7 @@ data = {'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.1
         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.log.niml.dset'};
     
 % Loop through each dataset
-for ii = 9:12% 1:numel(data,1)
+for ii = 1:numel(data,1)
     % Load data structure
     data_struct = afni_niml_readsimple(data{ii,3});
     % Get mapping direction
@@ -183,6 +192,7 @@ end
 %% Mapping function
 function mapped_data = map_data(data_struct,LtRs,LsRt,direction)
 d = data_struct.data;
+is_int_data = isint(d); % Check if integer data
 mapped_data = zeros(size(d,1),size(d,2));
 for ss = 1:size(d,2) % Subjects/volumes
     disp(['Mapping data (direction ' direction ') for Subject/Volume # ' num2str(ss)])
@@ -193,7 +203,11 @@ for ss = 1:size(d,2) % Subjects/volumes
             % Find all the seed nodes that mapped to this target
             inds = find(LtRs(:,1) == nn);
             if numel(inds) > 0
-                val = mean(ds(inds));
+                if is_int_data % Use mode if integer data
+                    val = mode(ds(inds));
+                else
+                    val = mean(ds(inds));
+                end
             else
                 % If there were no seeds mapped to this target, base the data on
                 % this node's target
@@ -203,7 +217,11 @@ for ss = 1:size(d,2) % Subjects/volumes
             % Find all the seed nodes that mapped to this target
             inds = find(LsRt(:,2) == nn);
             if numel(inds) > 0
-                val = mean(ds(inds));
+                if is_int_data % Use mode if integer data
+                    val = mode(ds(inds));
+                else
+                    val = mean(ds(inds));
+                end
             else
                 % If there were no seeds mapped to this target, base the data on
                 % this node's target
