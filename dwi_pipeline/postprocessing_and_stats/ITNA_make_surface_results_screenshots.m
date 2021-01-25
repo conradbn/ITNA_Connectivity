@@ -171,18 +171,17 @@ input_strings = {
 for ii = 1:size(input_strings,1)
     % Get inputs 
     label = input_strings{ii,1};
-    dset = [label '_TFCE_Zscore_100000iters_MASK.niml.dset'];
+    dset = [label '_ALLDATA_count.niml.dset']; % [label '_TFCE_Zscore_100000iters_MASK.niml.dset'];
     h = input_strings{ii,2};
     d = input_strings{ii,3};
     
     % Set strings
-    
     hemi = h;
     mesh = strrep(d,'ld','');
-    cmap = 'matter.niml.cmap';
-    dimfac = '1';
-    t_thresh = '-T_val 1.96';
-    i_range = '0 4.16';
+    cmap = 'dense.niml.cmap'; %'matter.niml.cmap';
+    dimfac = '0.8';
+    t_thresh = '-T_val 0.51'; %'-T_val 1.96';
+    i_range ='0 1'; %'0 4.16';
     
     % Set mask dataset(s) based on label
     dset_mask = {};
