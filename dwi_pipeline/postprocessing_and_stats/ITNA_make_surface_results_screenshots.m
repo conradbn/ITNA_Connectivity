@@ -48,51 +48,107 @@ input_strings = {
 for ii = 1:size(input_strings,1)
     % Get inputs 
     label = input_strings{ii,1};
-    h = input_strings{ii,2};
-    d = input_strings{ii,3};
-    
-    % Set strings
-    dset = [label '_TFCE_Zscore_100000iters_MASK.niml.dset'];
-    hemi = h;
-    mesh = strrep(d,'ld','');
-    cmap = 'coolwarm.niml.cmap';
-    dimfac = '0.6';
-    i_range = '4.26';
-    t_thresh = '-T_val 1.96';
+    cd([top_dir '/' label])
+    hemi = input_strings{ii,2};
+    dens = input_strings{ii,3};
+    mesh = strrep(dens,'ld','');
     
     % Set mask dataset(s) based on label
     dset_mask = {};
     if contains(label,'DigLH') && strcmp(hemi,'lh')
-        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
+        dset_mask = [dset_mask,['../Masks/LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
     elseif contains(label,'DigLH')
-        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam_MAP2CON.niml.dset']];
+        dset_mask = [dset_mask,['../Masks/LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam_MAP2CON.niml.dset']];
     end
     if contains(label,'DigRH') && strcmp(hemi,'lh')
-        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam_MAP2CON.niml.dset']];
+        dset_mask = [dset_mask,['../Masks/LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam_MAP2CON.niml.dset']];
     elseif contains(label,'DigRH')
-        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']];
+        dset_mask = [dset_mask,['../Masks/LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']];
     end
     if  contains(label,'LetLH') 
-        dset_mask = [dset_mask,['LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
+        dset_mask = [dset_mask,['../Masks/LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
     end
+    
+    %% TFCE Zscore Results
+    % Set strings
+    dset = [label '_TFCE_Zscore_100000iters_MASK.niml.dset'];
+    cmap = '../cmaps/coolwarm.niml.cmap';
+    dimfac = '0.6';
+    i_range = '4.26';
+    t_thresh = '-T_val 1.96';
     
     % Call functions to create screenshots (first remove those that exist)
     unix(['rm -f ' label '*.jpg & sleep 3']);
-    call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask);
+    call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,0);
     % Crop whitespace from all images and make consistent size
     unix(['mogrify -trim ' label '*.jpg & sleep 3']);
     unix(['mogrify -resize 1000x1000 ' label '*.jpg & sleep 3']);
     % Create montage of all four views
     create_montage(label,hemi);
+    
+    %% Bayes Factor Results
+    % Set strings
+    dset = [label '_TFCE_Zscore_100000iters_MASK_uncorrBFboth.niml.dset'];
+    label_new = strrep(dset,'.niml.dset','');
+    cmap = '../cmaps/coolwarm.niml.cmap';
+    dimfac = '0.6';
+    i_range = '-19 19';
+    t_thresh = '-T_val 2';
+    
+    % Call functions to create screenshots (first remove those that exist)
+    unix(['rm -f ' label_new '*.jpg & sleep 3']);
+    call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,1);
+    % Crop whitespace from all images and make consistent size
+    unix(['mogrify -trim ' label_new '*.jpg & sleep 3']);
+    unix(['mogrify -resize 1000x1000 ' label_new '*.jpg & sleep 3']);
+    % Create montage of all four views
+    create_montage(label_new,hemi);
+    
+    %% Raw T-stat Results
+    % Set strings
+    dset = [label '_TFCE_Zscore_100000iters_MASK_uncorrT.niml.dset'];
+    label_new = strrep(dset,'.niml.dset','');
+    cmap = '../cmaps/coolwarm.niml.cmap';
+    dimfac = '0.6';
+    i_range = '-5 5';
+    t_thresh = '-T_val 2.06';
+    
+    % Call functions to create screenshots (first remove those that exist)
+    unix(['rm -f ' label_new '*.jpg & sleep 3']);
+    call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,1);
+    % Crop whitespace from all images and make consistent size
+    unix(['mogrify -trim ' label_new '*.jpg & sleep 3']);
+    unix(['mogrify -resize 1000x1000 ' label_new '*.jpg & sleep 3']);
+    % Create montage of all four views
+    create_montage(label_new,hemi);
+        
+    %% Conjunction Results
+    % Set strings
+    dset = [label '_ALLDATA_count.niml.dset'];
+    dset = strrep(dset,'_vs_','_CONJ_');
+    label_new = strrep(dset,'.niml.dset','');
+    cmap = '../cmaps/dense.niml.cmap'; %'matter.niml.cmap';
+    dimfac = '0.9';
+    t_thresh = '-T_val 0.51'; %'-T_val 1.96';
+    i_range ='0 1'; %'0 4.16';
+    
+    % Call functions to create screenshots (first remove those that exist)
+    unix(['rm -f ' label_new '*.jpg & sleep 3']);
+    call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,0);
+    % Crop whitespace from all images and make consistent size
+    unix(['mogrify -trim ' label_new '*.jpg & sleep 3']);
+    unix(['mogrify -resize 1000x1000 ' label_new '*.jpg & sleep 3']);
+    % Create montage of all four views
+    create_montage(label_new,hemi);
+    
 end
-
 
 %% Create screenshots and montages for raw connectivity maps
 input_strings = {
     % Structural Connectivity
-    'mask_PairedTest_SC_DigLH_vs_LetLH_log+c_SET1_MEAN.niml.dset','lh','ld141';...
-    'mask_PairedTest_SC_DigLH_vs_LetLH_log+c_SET2_MEAN.niml.dset','lh','ld141';...
-    'mask_PairedTest_SC_DigLH_vs_DigRH_log+c_on_RHsurf_SET2_MEAN.niml.dset','rh','ld141';...
+    'mask_PairedTest_SC_DigLH_vs_LetLH_log+c_SET1_MEAN.grth-6.niml.dset','lh','ld141';...
+    'mask_PairedTest_SC_DigLH_vs_LetLH_log+c_SET2_MEAN.grth-6.niml.dset','lh','ld141';...
+    'mask_PairedTest_SC_DigLH_vs_DigRH_log+c_on_RHsurf_SET2_MEAN.grth-6.niml.dset','rh','ld141';...
     'PairedTest_SC_DigLH_vs_LetLH_log+c_SET1_MEAN.niml.dset','lh','ld141';...
     'PairedTest_SC_DigLH_vs_LetLH_log+c_SET2_MEAN.niml.dset','lh','ld141';...
     'PairedTest_SC_DigLH_vs_DigRH_log+c_on_RHsurf_SET2_MEAN.niml.dset','rh','ld141';...
@@ -102,17 +158,16 @@ input_strings = {
     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_SET2_MEAN.niml.dset','lh','ld60';...
     'PairedTest_FC_ALL_DigLH_vs_DigRH_on_RHsurf_SET2_MEAN.niml.dset','rh','ld60'};
 
-for ii = 1:size(input_strings,1)
+for ii = 1:3%:size(input_strings,1)
     % Get inputs 
     dset = input_strings{ii,1};
-    h = input_strings{ii,2};
-    d = input_strings{ii,3};
+    hemi = input_strings{ii,2};
+    dens = input_strings{ii,3};
     
     % Set strings
     label = strrep(dset,'.niml.dset','');
-    hemi = h;
-    mesh = strrep(d,'ld','');
-    cmap = 'rainbow.niml.cmap';
+    mesh = strrep(dens,'ld','');
+    cmap = 'cmaps/rainbow.niml.cmap';
     dimfac = '0.5';
     
     if contains(label,'SC')
@@ -125,101 +180,31 @@ for ii = 1:size(input_strings,1)
     
     % Set mask dataset(s) based on label
     if contains(label,'DigLH') && contains(label,'SET1')
-       dset_mask = {['LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
+       dset_mask = {['Masks/LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
     elseif contains(label,'LetLH') && contains(label,'SET2')
-       dset_mask = {['LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
+       dset_mask = {['Masks/LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
     elseif contains(label,'DigRH') && contains(label,'SET2')
-       dset_mask = {['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']};
+       dset_mask = {['Masks/LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']};
     end
     
     % Call functions to create screenshots (first remove those that exist)
     unix(['rm -f ' label '*.jpg & sleep 3']);
-    call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask);
+    call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,0);
     % Crop whitespace from all images and make consistent size
     unix(['mogrify -trim ' label '*.jpg & sleep 3']);
     unix(['mogrify -resize 1000x1000 ' label '*.jpg & sleep 3']);
     % Create montage of all four views
     create_montage(label,hemi);
 end
-
-%% Create screenshots and montages for Conjunction results
-input_strings = {
-    % Structural Connectivity Contrasts
-    'PairedTest_SC_DigLH_CONJ_LetLH_log+c','lh','ld141';...
-    'PairedTest_SC_DigLH_CONJ_DigRH_log+c_on_LHsurf','lh','ld141';...
-    'PairedTest_SC_DigLH_CONJ_DigRH_log+c_on_RHsurf','rh','ld141';...
-
-    % Functional Connectivity Contrasts - Digit CONJ Letter
-    'PairedTest_FC_ALL_DigLH_CONJ_ALL_LetLH','lh','ld60';...
-    'PairedTest_FC_Dp_DigLH_CONJ_Da_DigLH','lh','ld60';...
-    'PairedTest_FC_Lp_LetLH_CONJ_La_LetLH','lh','ld60';...
-    'PairedTest_FC_Dp-Da_DigLH_CONJ_Lp-La_LetLH','lh','ld60';...
-
-    % Functional Connectivity Contrasts - Task-level        
-    'PairedTest_FC_DTask_DigLH_CONJ_LTask_DigLH','lh','ld60';...
-    'PairedTest_FC_DTask_LetLH_CONJ_LTask_LetLH','lh','ld60';...
-    'PairedTest_FC_Dp_DigLH_CONJ_Lp_DigLH','lh','ld60';... 
-    'PairedTest_FC_Dp_LetLH_CONJ_Lp_LetLH','lh','ld60';...
-          
-    % Functional Connectivity Contrasts - Digit L CONJ Digit R
-    'PairedTest_FC_ALL_DigLH_CONJ_DigRH_on_LHsurf','lh','ld60';...
-    'PairedTest_FC_ALL_DigLH_CONJ_DigRH_on_RHsurf','rh','ld60';...
-    'PairedTest_FC_Dp_DigRH_CONJ_Da_DigRH_on_RHsurf','rh','ld60';...
-    'PairedTest_FC_Dp-Da_DigLH_CONJ_DigRH_on_LHsurf','lh','ld60';...
-    'PairedTest_FC_Dp-Da_DigLH_CONJ_DigRH_on_RHsurf','rh','ld60'};
-
-for ii = 1:size(input_strings,1)
-    % Get inputs 
-    label = input_strings{ii,1};
-    dset = [label '_ALLDATA_count.niml.dset']; % [label '_TFCE_Zscore_100000iters_MASK.niml.dset'];
-    h = input_strings{ii,2};
-    d = input_strings{ii,3};
-    
-    % Set strings
-    hemi = h;
-    mesh = strrep(d,'ld','');
-    cmap = 'dense.niml.cmap'; %'matter.niml.cmap';
-    dimfac = '0.8';
-    t_thresh = '-T_val 0.51'; %'-T_val 1.96';
-    i_range ='0 1'; %'0 4.16';
-    
-    % Set mask dataset(s) based on label
-    dset_mask = {};
-    if contains(label,'DigLH') && strcmp(hemi,'lh')
-        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
-    elseif contains(label,'DigLH')
-        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam_MAP2CON.niml.dset']];
-    end
-    if contains(label,'DigRH') && strcmp(hemi,'lh')
-        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam_MAP2CON.niml.dset']];
-    elseif contains(label,'DigRH')
-        dset_mask = [dset_mask,['LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']];
-    end
-    if  contains(label,'LetLH') 
-        dset_mask = [dset_mask,['LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
-    end
-    
-    % Call functions to create screenshots (first remove those that exist)
-    unix(['rm -f ' label '*.jpg & sleep 3']);
-    call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask);
-    % Crop whitespace from all images and make consistent size
-    unix(['mogrify -trim ' label '*.jpg & sleep 3']);
-    unix(['mogrify -resize 1000x1000 ' label '*.jpg & sleep 3']);
-    % Create montage of all four views
-    create_montage(label,hemi);
-end
-
-
-
 
 %% Global function to call SUMA
 % Will build a full tsch script line by line, then runs the sript
-function call_SUMA(dset,label,hemi,mesh,cmap,dimfac, i_range,t_thresh,dset_mask) 
+function call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,sulc_off) 
 % Remove script if it exists
 unix(['rm -f ' label '_DriveSuma.tcsh']);
 
 % Set newline print command for cleaner looking code
-addstr = "fprintf(fid, '%s\n', str)";
+addstr = "fprintf(fid, '%s\n', str);";
 
 % Start new script file
 fid = fopen([label '_DriveSuma.tcsh'],'w');
@@ -250,6 +235,11 @@ elseif numel(dset_mask) == 2
     str = ['DriveSuma -com surf_cont -load_dset ' dset_mask{2} ' -switch_cmap inverted_gray_circle -I_sb 1 -I_range 1']; eval(addstr);
 end
 
+% Turn off the sulcal highlights
+if sulc_off
+    str = 'DriveSuma -com viewer_cont -key:s0.2 "b"'; eval(addstr);
+end
+
 % Inflate, rotate, etc, and record screenshots
 str = ['DriveSuma -com viewer_cont -viewer_size 1000 1000'... % Window size
     ' -bkg_col 1 1 1'... % Background color
@@ -262,8 +252,9 @@ str = ['DriveSuma -com viewer_cont -viewer_size 1000 1000'... % Window size
     ' -key:s0.2 "ctrl+right" -key:s0.2 "ctrl+r"'...
     ' -key:s0.2 "ctrl+up" -key:s0.2 "ctrl+r"']; eval(addstr);
 
+
 % Kill the SUMA window
-str = 'DriveSuma -com kill_suma'; eval(addstr);
+str = 'DriveSuma -com kill_suma & sleep 3'; eval(addstr);
 fclose(fid);
 
 % Actually run the final script
