@@ -120,34 +120,34 @@ input_strings = {
 cd(data_dir)
 niters = 100000; % Total number of iterations for TFCE
 test = 2; % All of the tests here are paired two-sample tests
-% for ii = 1:size(input_strings,1)
-%     % Get the label for this test 
-%     label = [out_dir '/' input_strings{ii,1}];
-%     hemi = input_strings{ii,2};
-%     density = input_strings{ii,3};
-%     mask_dset = input_strings{ii,4};
-%     
-%     % Create mean datasets for inspection/visualizaton
-%     unix(['3dTstat -mean -overwrite -prefix ' label '_SET1_MEAN '...
-%         input_strings{ii,5}]);
-%     unix(['3dTstat -mean -overwrite -prefix ' label '_SET2_MEAN '...
-%         input_strings{ii,6}]);
-%     
-%     % Combine all data into one input file
-%     unix(['3dTcat -overwrite -prefix ' label '_ALLDATA '...
-%         input_strings{ii,5} ' ' input_strings{ii,6}]);
-%     
-%     in_dset = [label '_ALLDATA.niml.dset'];
-%     
-%     % Set filename for the output statistic dataset and number of iterations
-%     out = [label '_TFCE_Zscore_' num2str(niters) 'iters_MASK.niml.dset'];
-%     
-%     % Specify no input null (i.e. use the program's default method)
-%     out_dset_null = '';
-%     
-%     % Call global function
-%     setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
-% end
+for ii = 1:size(input_strings,1)
+    % Get the label for this test 
+    label = [out_dir '/' input_strings{ii,1}];
+    hemi = input_strings{ii,2};
+    density = input_strings{ii,3};
+    mask_dset = input_strings{ii,4};
+    
+    % Create mean datasets for inspection/visualizaton
+    unix(['3dTstat -mean -overwrite -prefix ' label '_SET1_MEAN '...
+        input_strings{ii,5}]);
+    unix(['3dTstat -mean -overwrite -prefix ' label '_SET2_MEAN '...
+        input_strings{ii,6}]);
+    
+    % Combine all data into one input file
+    unix(['3dTcat -overwrite -prefix ' label '_ALLDATA '...
+        input_strings{ii,5} ' ' input_strings{ii,6}]);
+    
+    in_dset = [label '_ALLDATA.niml.dset'];
+    
+    % Set filename for the output statistic dataset and number of iterations
+    out = [label '_TFCE_Zscore_' num2str(niters) 'iters_MASK.niml.dset'];
+    
+    % Specify no input null (i.e. use the program's default method)
+    out_dset_null = '';
+    
+    % Call global function
+    setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
+end
 
 
 %% Run conjunction analyses
@@ -157,7 +157,7 @@ cd(data_dir)
 niters = 100000; % Total number of iterations for TFCE
 test = 1; % All of the tests here are one-sample tests
 
-for ii = 1:size(input_strings,1)
+for ii = 1:3%size(input_strings,1)
     % Get the label for this test 
     label = [out_dir '/' input_strings{ii,1}];
     hemi = input_strings{ii,2};
@@ -171,14 +171,14 @@ for ii = 1:size(input_strings,1)
     % on the overlap maps)
     if contains(label,'PairedTest_SC')
         % Threhsold stuctural connectivity maps
-        cutoff = -7;
-        thr_name1 = strrep(input_strings{ii,5},'.niml.dset','.thr-7.niml.dset');
+        cutoff = -6;
+        thr_name1 = strrep(input_strings{ii,5},'.niml.dset','.thr-6.niml.dset');
         ds = afni_niml_readsimple(input_strings{ii,5});
         ds.data(ds.data > cutoff) = 1;
         ds.data(ds.data <= cutoff) = 0;
         afni_niml_writesimple(ds,thr_name1);
         
-        thr_name2 = strrep(input_strings{ii,6},'.niml.dset','.thr-7.niml.dset');
+        thr_name2 = strrep(input_strings{ii,6},'.niml.dset','.thr-6.niml.dset');
         ds = afni_niml_readsimple(input_strings{ii,6});
         ds.data(ds.data > cutoff) = 1;
         ds.data(ds.data <= cutoff) = 0;
@@ -225,7 +225,7 @@ for ii = 1:size(input_strings,1)
     afni_niml_writesimple(ds,out_count);
     
     % Call global function
-    setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
+    %setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_dset_null)
     
 end
     
