@@ -67,7 +67,7 @@ for ii = 1:numel(sub_dirs)
     
     %% Transform track file, create TDI, and smooth 
     rois = dir('*binary_vol_al2dwi.nii.gz');
-    for jj = 3%1:numel(rois)
+    for jj = 1:numel(rois)
         r = strrep(rois(jj).name,'.binary_vol_al2dwi.nii.gz','');
         % Apply nonlinear transform to MNI space
         unix(['tcktransform -force tracks_ss3t_' sub '_50M_' r '.tck'...
