@@ -41,29 +41,29 @@ for ii = 1:numel(sub_dirs)
     disp(['***** WORKING ON ' sub ' ******'])
     % Copy to temp directory
     tmp_dir = [local_dir '/' sub];
-    %mkdir(tmp_dir)
-%     unix(['cp ../' input ' ' warp ' ' affine ' ../' affine_dwi ' ' tmp_dir]);
+    mkdir(tmp_dir)
+    unix(['cp ../' input ' ' warp ' ' affine ' ../' affine_dwi ' ' tmp_dir]);
     cd(tmp_dir);
-%     
-%     % Initialize warp (ORIGINALLY RAN THIS WITH DWI SPACE IMAGE INSTEAD OF
-%     % TEMPLATE, THIS WAS INCORRECT AND LED TO WEIRD CROPPING IN SEVERAL SUBJECTS)
-%     unix(['warpinit -force ' template ' identity_warp[].nii']); %input
-% 
-%     % Apply the affine + nonlinear transformation to the identity warp
-%     % Here we are performing the inverse transform as this is what is required
-%     % for transformation of tck files (i.e. streamlines)
-%     for kk = 0:2
-%         unix(['~/abin/3dNwarpApply -iwarp -nwarp "' warp ' ' affine ' INV(' affine_dwi ')"'...
-%               ' -source  identity_warp' num2str(kk) '.nii'...
-%               ' -master ' input... 
-%               ' -prefix inv_mrtrix_warp' num2str(kk) '.nii']);
-%     end
-% 
-%     %% Fix warp (replaces 0,0,0 with NaN,NaN,NaN to fit with MRtrix convention)
-%     unix('warpcorrect -force inv_mrtrix_warp[].nii inv_mrtrix_warp_corrected.mif')% -marker -1');
-% 
-%     %% Transform MNI template to DWI space for verification
-%     unix(['mrtransform -force ' template ' -warp inv_mrtrix_warp_corrected.mif template_warped2dwi.mif']);
+    
+    % Initialize warp (ORIGINALLY RAN THIS WITH DWI SPACE IMAGE INSTEAD OF
+    % TEMPLATE, THIS WAS INCORRECT AND LED TO WEIRD CROPPING IN SEVERAL SUBJECTS)
+    unix(['warpinit -force ' template ' identity_warp[].nii']); %input
+
+    % Apply the affine + nonlinear transformation to the identity warp
+    % Here we are performing the inverse transform as this is what is required
+    % for transformation of tck files (i.e. streamlines)
+    for kk = 0:2
+        unix(['~/abin/3dNwarpApply -iwarp -nwarp "' warp ' ' affine ' INV(' affine_dwi ')"'...
+              ' -source  identity_warp' num2str(kk) '.nii'...
+              ' -master ' input... 
+              ' -prefix inv_mrtrix_warp' num2str(kk) '.nii']);
+    end
+
+    %% Fix warp (replaces 0,0,0 with NaN,NaN,NaN to fit with MRtrix convention)
+    unix('warpcorrect -force inv_mrtrix_warp[].nii inv_mrtrix_warp_corrected.mif')% -marker -1');
+
+    %% Transform MNI template to DWI space for verification
+    unix(['mrtransform -force ' template ' -warp inv_mrtrix_warp_corrected.mif template_warped2dwi.mif']);
     
     %% Transform track file, create TDI, and smooth 
     rois = dir('*binary_vol_al2dwi.nii.gz');
