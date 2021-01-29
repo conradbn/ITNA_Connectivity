@@ -15,46 +15,44 @@ cd(process_dir);
 niis = dir('*.MNI.TDI.6mm.nii.gz');
 
 %% Run across subjects/atlases
-% % Set thresholds
-% tract_thresh = 0.75;
-% tdi_thresh = 5;
-% % Loop
-% for ii = 1:numel(atlas_names)
-%     % Read in atlas information
-%     a_name = atlas_names{ii};
-%     a_table = readtable([atlas_dir '/' a_name '/' a_name '_info.csv']);
-%     a_nii = [atlas_dir '/' a_name '/' a_name '.nii'];
-%     tracts = niftiread(a_nii); tracts = single(tracts);
-%     % Loop through tracts
-%     for kk = 1:size(a_table,1)
-%         tract = tracts(:,:,:,kk);
-%         % Loop through subjects
-%         parfor jj = 1:numel(niis)
-%             disp(['--------- WORKING ON '...
-%                 ' atlas ' num2str(ii) ' of ' num2str(numel(atlas_names))...
-%                 ' / tract ' num2str(kk) ' of ' num2str(size(a_table,1))...
-%                 ' / subject ' num2str(jj) ' of ' num2str(numel(niis))]);
-%             % Load subject TDI map
-%             tdi = niftiread(niis(jj).name);
-%             % Run function
-%             dice(jj) =  calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh);
-%         end
-%         % Add dice values to structure
-%         dice_all.(a_name)(kk,:) = dice; clear dice
-%     end
-%     % Add tract label names to structure
-%     dice_all.([a_name '_labels'])(:) = a_table.BundleName';
-% end
-% save([process_dir '/../dice_Xtract_allsubs.mat']);
+% Set thresholds
+tract_thresh = 0.75;
+tdi_thresh = 5;
+% Loop
+for ii = 1:numel(atlas_names)
+    % Read in atlas information
+    a_name = atlas_names{ii};
+    a_table = readtable([atlas_dir '/' a_name '/' a_name '_info.csv']);
+    a_nii = [atlas_dir '/' a_name '/' a_name '.nii'];
+    tracts = niftiread(a_nii); tracts = single(tracts);
+    % Loop through tracts
+    for kk = 1:size(a_table,1)
+        tract = tracts(:,:,:,kk);
+        % Loop through subjects
+        parfor jj = 1:numel(niis)
+            disp(['--------- WORKING ON '...
+                ' atlas ' num2str(ii) ' of ' num2str(numel(atlas_names))...
+                ' / tract ' num2str(kk) ' of ' num2str(size(a_table,1))...
+                ' / subject ' num2str(jj) ' of ' num2str(numel(niis))]);
+            % Load subject TDI map
+            tdi = niftiread(niis(jj).name);
+            % Run function
+            dice(jj) =  calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh);
+        end
+        % Add dice values to structure
+        dice_all.(a_name)(kk,:) = dice; clear dice
+    end
+    % Add tract label names to structure
+    dice_all.([a_name '_labels'])(:) = a_table.BundleName';
+end
+save([process_dir '/../dice_Xtract_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat']);
 
 %% Plot full results
 clear all; close all
 process_dir = '/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/Tract_Overlap/MNI_TDI_maps';
 cd(process_dir);
-load([process_dir '/../dice_Xtract_allsubs.mat']);
+%load([process_dir '/../dice_Xtract_allsubs.mat']);
 
-
-%
 for ii = 1:numel(atlas_names)
     a_name = atlas_names{ii};
     
@@ -103,6 +101,15 @@ for ii = 1:numel(atlas_names)
     [~,new_order] = sort(dice_Sum_DigL(:,1),'descend');
     dice_Reduced = dice_Reduced(:,new_order,:);
     labels_Reduced = labels_Reduced(new_order);
+    
+    %% Write out csv file of mean dice results
+    T = table();
+    T.bundle_name = strrep(labels_Reduced,' left','')';
+    T.Digit_area_L = squeeze(mean(dice_Reduced(:,:,1)))';
+    T.Letter_area_L = squeeze(mean(dice_Reduced(:,:,2)))';
+    T.Digit_area_R = squeeze(mean(dice_Reduced(:,:,3)))';
+    writetable(T,['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '_groupmean.csv']);
+    
     
     %% Run Ttests
     for tt = 1:size(dice_Reduced,2)
@@ -176,187 +183,8 @@ for ii = 1:numel(atlas_names)
     low = min(dice_Reduced(:));
     high = max(dice_Reduced(:));
     ax.YLim = [0 high+.05];
-    export_fig(['bundle_overlap_' a_name],'-png','-m2','-transparent');
-
-    
-    
-%% Plot Dice Diff
-%     d_Diff = d_Combined(:,:,1) - d_Combined(:,:,2);
-%     figure('Position',[100,100,2000,1200]);
-%     % Line at zero
-%     yline(0,'LineWidth',3);
-%     hold on
-%     ax = gca;
-%     % Add patches
-%     for kk = 1.5:2:numel(labels)
-%         patch([kk kk+1 kk+1 kk],[ax.YLim(1) ax.YLim(1) ax.YLim(2) ax.YLim(2)],[.8 .8 .8],'FaceAlpha',0.5,'EdgeColor','none');
-%     end
-%     % Custom Boxplots
-%     import iosr.statistics.*
-%     bp = boxPlot(d_Diff);
-%     view([-270 90])
-% %     bp.boxColor = {[.9 .3 .3] [.3 .3 .9]};
-%     bp.boxColor = {[.6 .3 .6]};
-%     bp.lineWidth = 2;
-%     bp.boxWidth = .35;
-% %     bp.lineColor = {[.9 .3 .3] [.3 .3 .9]};
-% %     bp.medianColor = {[.9 .3 .3] [.3 .3 .9]};
-%     bp.lineColor = {[.6 .3 .6]};
-%     bp.medianColor = {[.6 .3 .6]};
-%     bp.showMean = true;
-%     bp.meanMarker = '.';
-%     bp.meanColor = 'k';
-%     bp.meanSize = 30;
-%     bp.showOutliers = false;
-%     % bp.symbolMarker = '.'
-%     % bp.symbolColor = [.8 .8 .8]
-%     grid on
-%     ax = gca;
-%     ax.FontSize = 17;
-%     %ax.YLim = [0.1 0.5];
-%     ax.GridAlpha = .2;
-%     ax.GridLineStyle = '--';
-%     % Title
-%     ax.Title.String = ['Bundle overlap difference between Digit and Letter ROIs'];
-%     ax.Title.Interpreter = 'none';
-%     ax.Title.FontSize = 30;
-%     % X Ticks
-%     ax.XTick = 1:numel(labels);
-%     ax.XTickLabel = labels;
-%     ax.XAxis.FontSize = 12;
-%     ax.XAxis.FontWeight = 'bold';
-%     % Axis labels
-%     ax.XLabel.String = 'Bundle';
-%     ax.XLabel.FontSize = 30;
-%     ax.XLabel.FontWeight = 'bold';
-%     ax.YLabel.String = 'Difference in Dice coefficient';
-%     ax.YLabel.FontSize = 30;
-%     ax.YLabel.FontWeight = 'bold';
-%     ax.TickLabelInterpreter = 'none';
-%     
-%     % Reset Yaxis 
-%     low = min(d_Diff(:));
-%     high = max(d_Diff(:));
-%     ax.YLim = [low-.05 high+.05];
-%     
-%     export_fig(['bundle_overlap_differences_' h '_' a_name],'-png','-m2');
-%     
-%     
-% %     % TTests
-% %     [htest,p,ci,stat] = ttest(d_Digit,d_Letter,'Alpha',0.05/size(d,2)); % Bonferoni corrected
-% %     ind = 1;
-% %     for kk = 1:numel(htest)
-% %         if htest(kk) == 1
-% %             t_sig(ind) = stat.tstat(kk);
-% %             l2(ind) = l(kk);
-% %             ind = ind + 1;
-% %         else
-% %             continue
-% %         end
-% %     end
-% %     figure('Position',[100,100,2000,1200]);
-% %     hold on
-% %     for kk = 1:numel(t_sig)
-% %         if t_sig(kk) > 0
-% %             b = bar(kk,t_sig(kk));
-% %             b.FaceColor = [.9 .3 .3];
-% %         else
-% %             b = bar(kk,t_sig(kk));
-% %             b.FaceColor = [.3 .3 .9];
-% %         end
-% %     end
-% %     
-% %     ax = gca;
-% %     grid on
-% %     ax = gca;
-% %     ax.FontSize = 17;
-% %     %ax.YLim = [0.1 0.5];
-% %     ax.GridAlpha = .2;
-% %     ax.GridLineStyle = '--';
-% %     % Title
-% %     ax.Title.String = [a_name ' bundles showing significant difference in overlap with ' h ' hemisphere ROI projections'];
-% %     ax.Title.Interpreter = 'none';
-% %     ax.Title.FontSize = 30;
-% %     % X Ticks
-% %     ax.XTick = 1:numel(l2);
-% %     ax.XTickLabelRotation = 270;
-% %     ax.XTickLabel = l2;
-% %     ax.XTickLabelRotation = 270;
-% %     ax.XAxis.FontSize = 12;
-% %     ax.XAxis.FontWeight = 'bold';
-% %     % Axis labels
-% %     ax.XLabel.String = 'Bundle';
-% %     ax.XLabel.FontSize = 30;
-% %     ax.XLabel.FontWeight = 'bold';
-% %     ax.YLabel.String = 'T-statistic of Difference in overlap (paired test)';
-% %     ax.YLabel.FontSize = 30;
-% %     ax.YLabel.FontWeight = 'bold';
-% %     ax.TickLabelInterpreter = 'none';
-% %     
-% %     %export_fig(['bundle_overlap_differences_' h '_' a_name],'-png','-m2');
-% %     
-% %     clear t_sig l2 l b
-%     
-end
-
-
-
-
-%     %subplot(2,3,ii)
-%     %subtightplot(2,3,ii,[0.05,0.05])
-%     %bar(d')
-%     notBoxPlot(atanh(d_Reorder));
-%     
-%     %bar(normalize(atanh(d),2)');
-%     ax = gca;
-%     ax.XTick = 1:numel(l);
-%     ax.XTickLabelRotation = 270;
-%     ax.XTickLabel = l;
-%     ax.TickLabelInterpreter = 'none';
-%     ax.FontSize = 10;
-%     ax.FontWeight = 'bold';
-%     grid on
-%     legend(['Digit ROI Projections (' h ')'], ['Letter ROI Projections (' h ')']);
-%     title(['Track density overlap with ' a_name ' bundles']);
-%     ax.YLabel.String = 'Correlation between images (Fisher Z)';
-%     %ax.YLim = [0.5 4.5];
-%     ax.Title.FontSize = 15;
-%     
-%% Plot reduced results
-% cutoff = 0.15;
-% cost_fxn = 10;
-% figure('Position',[100,100,2000,1200]);
-% for ii = 1:numel(atlas_names)
-%     a_name = atlas_names{ii};
-%     d = overlap.(a_name)(:,:,cost_fxn);
-%     l = overlap.([a_name '_labels'])(1,:);
-%     
-%     indkeep = sum(d>=cutoff,1) ~= 0;
-%     d = d(:,indkeep);
-%     l = l(:,indkeep);
-%     
-%     subplot(2,3,ii)
-%     %subtightplot(2,3,ii,[0.05,0.05])
-%     %bar(d')
-%     bar(atanh(d'));
-%     %bar(normalize(atanh(d),2)');
-%     ax = gca;
-%     ax.XTick = 1:numel(l);
-%     ax.XTickLabelRotation = 330;
-%     ax.XTickLabel = l;
-%     ax.TickLabelInterpreter = 'none';
-%     ax.FontSize = 13;
-%     ax.FontWeight = 'bold';
-%     grid on
-%     legend(['Digit ROI Projections (' h ')'], ['Letter ROI Projections (' h ')']);
-%     title(['Track density overlap with ' a_name ' bundles']);
-%     ax.YLabel.String = 'Correlation between images (Fisher Z)';
-%     ax.YLim = [0 1.1];
-%     ax.Title.FontSize = 15;
-% end
-% 
-% export_fig(['tract_overlap_difference_' h '_reduced'],'-png','-m2');
-
+    export_fig(['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat'],'-png','-m2','-transparent');
+   
 %% Dice overlap function
 function dice = calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh)
     % Load the nifti images
