@@ -6,7 +6,7 @@
 purge 
 
 atlas_names = {'Xtract'};% {'AFQ','AFQclipped' 'Recobundles' 'TractSeg' 'Tracula'} 
-atlas_dir = '/Users/benconrad/Desktop/Pandora_Atlas';
+atlas_dir = '/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface/Pandora_Atlas';%'/Users/benconrad/Desktop/Pandora_Atlas';
 mask = [atlas_dir '/MNI152_2009_template_mask.nii.gz'];
 
 % Get filenames for each subject
@@ -16,8 +16,8 @@ niis = dir('*.MNI.TDI.6mm.nii.gz');
 
 %% Run across subjects/atlases
 % Set thresholds
-tract_thresh = 0.75;
-tdi_thresh = 5;
+tract_thresh = .6;
+tdi_thresh = 3;
 % Loop
 for ii = 1:numel(atlas_names)
     % Read in atlas information
@@ -48,7 +48,7 @@ end
 save([process_dir '/../dice_Xtract_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat']);
 
 %% Plot full results
-clear all; close all
+% clear all; close all
 process_dir = '/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/Tract_Overlap/MNI_TDI_maps';
 cd(process_dir);
 %load([process_dir '/../dice_Xtract_allsubs.mat']);
@@ -184,7 +184,8 @@ for ii = 1:numel(atlas_names)
     high = max(dice_Reduced(:));
     ax.YLim = [0 high+.05];
     export_fig(['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat'],'-png','-m2','-transparent');
-   
+end
+
 %% Dice overlap function
 function dice = calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh)
     % Load the nifti images
