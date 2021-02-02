@@ -46,6 +46,40 @@ function [tfce_ds] = ITNA_run_TFCE(surf_ds,vertices,faces,niters,out,surf_ds_nul
         opt.null = surf_ds_null;
     end
     
+    % Don't run stats testing if input is a single feature stat map
+    %  'feature_stat' - 'none': Do not compute statistics, but instead
+    %         use the input data from ds directly. In
+    %         this case:
+    %         * no statistic is computed;
+    %         * ds.samples must be a row vector.
+    %         * h0_mean is required.
+    %         * the 'null' option is required
+    %         * 'niter' must not be provided.
+    %         * when using the 'tfce' cluster_stat
+    %           option (the default), 'dh' must be
+    %           provided explicitly.
+    %         This option is intended for use when
+    %         null data and feature-wise statistics
+    %         have already been computed.    
+    % 
+    % 'dh',dh  (optional) Threshold step (only if cluster_stat is
+    %       'tfce'). The default value of dh=0.1 should be fine
+    %       in most (if not all) cases.
+    %       Exception: when using 'feature_stat','none',
+    %       the 'dh' option is required when using 'tfce'.
+    %       For typical use cases, a value so that 100*dh is
+    %       in the same order of magnitude as the range
+    %       (maximum minus minimum) of the input (in .samples)
+    %       may be a reasonable compromise between speed and
+    %       accuracy
+    
+    if size(surf_ds.samples,1) == 1 && ~isempty(surf_ds_null)
+        opt.feature_stat = 'none';
+        opt.dh = 0.1;%0.02; %max(surf_ds.samples)-min(surf_ds.samples) ~= 10 ;
+        opt = rmfield(opt,'niter');
+    end
+    
+    
     % Use parallel computing
     opt.nproc = 8;
     fprintf('Running multiple-comparison correction with these options:\n');
