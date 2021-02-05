@@ -6,37 +6,49 @@ cd(out_dir)
 niters = 200; % Total number of iterations for TFCE
 test = 1; % All of the tests here are one-sample tests
 input_strings = { % Linear Models
-                 'FC_DigL_ALL_Zmap','lh','ld60',...
-                    'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam_INV.niml.dset';      
-                 'FC_DigL_DpDa_Zdiff','lh','ld60',...
-                    'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam_INV.niml.dset';     
-                 'FC_DigL_LpLa_Zdiff','lh','ld60',...
-                    'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam_INV.niml.dset';     
-                 'FC_DigR_ALL_Zmap','rh','ld60',...
-                    'LitCoord_Digit_Pollack19_54_-52_-14_std.60_rh.inflated.14mm_diam_INV.niml.dset';       
-                 'FC_DigR_DpDa_Zdiff','rh','ld60',...
-                    'LitCoord_Digit_Pollack19_54_-52_-14_std.60_rh.inflated.14mm_diam_INV.niml.dset';
                  'SC_DigL','lh','ld141',...
                     'GroupMask_DigLH_LetLH_ConsThr0.3_ld141.niml.dset';            
                  'SC_LetL','lh','ld141',...
                     'GroupMask_DigLH_LetLH_ConsThr0.3_ld141.niml.dset' 
-                 'SC_DigR','lh','ld141',...
+                 'SC_DigR','rh','ld141',...
                     'GroupMask_DigLH_CONJ_DigRH_ConsThr0.3_on_RHsurf_ld141.niml.dset'}; 
+%                 'FC_DigL_ALL_Zmap','lh','ld60',...
+%                     'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam_INV.niml.dset';      
+%                  'FC_DigL_DpDa_Zdiff','lh','ld60',...
+%                     'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam_INV.niml.dset';     
+%                  'FC_DigL_LpLa_Zdiff','lh','ld60',...
+%                     'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam_INV.niml.dset';     
+%                  'FC_DigR_ALL_Zmap','rh','ld60',...
+%                     'LitCoord_Digit_Pollack19_54_-52_-14_std.60_rh.inflated.14mm_diam_INV.niml.dset';       
+%                  'FC_DigR_DpDa_Zdiff','rh','ld60',...
+%                     'LitCoord_Digit_Pollack19_54_-52_-14_std.60_rh.inflated.14mm_diam_INV.niml.dset';
                 
-dep_vars = {'Dp' 'DpDa'}; 
+dependent_vars = {'calc_skills_ss_PP19'
+            'lwidss_resid_PP19'
+            'fluencyss_resid_PP19'
+            'calcss_resid_PP19'
+            'ITG_CON_PP19'     % Note the ITG variables will be appended with L_ or R_ depending on the input data
+            'ITG_DBL_CON_PP19'};
 
 for ii = 1:size(input_strings,1)
-    for kk = 1:numel(dep_vars)
-        cd(out_dir)
-        dv = dep_vars{kk};
+     cd(out_dir)
+     data_dir = ['LinMdl_' input_strings{ii,1}];
+     hemi = input_strings{ii,2};
+     density = input_strings{ii,3};
+     mask_dset = input_strings{ii,4};
+     cd(data_dir)
+     
+    for kk = 1:numel(dependent_vars)
+        dv = dependent_vars{kk};
+        % Set the hemisphere of the data
+        if strcmp(hemi,'lh') && contains(dv,'ITG')
+            dv = ['L_' dv];
+        elseif strcmp(hemi,'rh') && contains(dv,'ITG')
+            dv = ['R_' dv];
+        end
  
         % Get the labels for this test       
-        data_dir = ['LinMdl_' input_strings{ii,1}];
-        cd(data_dir)
         label = [out_dir '/' data_dir '/' strrep(data_dir,'LinMdl_',['LinMdl_' dv '_x_'])];
-        hemi = input_strings{ii,2};
-        density = input_strings{ii,3};
-        mask_dset = input_strings{ii,4};
         
         % Single out the statistic dataset (i.e., the Tstat)
         dset = afni_niml_readsimple([label '.niml.dset']);
