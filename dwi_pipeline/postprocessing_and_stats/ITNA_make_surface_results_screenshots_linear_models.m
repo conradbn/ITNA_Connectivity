@@ -54,38 +54,44 @@ for ii = 1:size(input_strings,1)
     %% Get the dependent variables from the existing files
     dep_vars = dir(['LinMdl_*' conn '.niml.dset']);
     for dd = 1:numel(dep_vars)
-        label_dv = strrep(dep_vars(ii).name,'.niml.dset','');
+        label_dv = strrep(dep_vars(dd).name,'.niml.dset','');
+        if contains(label_dv,'Dp') % Skip these results from a previous iteration of linear models
+            continue
+        end
         %% TFCE Zscore Results
         % Set strings
         dset = [label '_TFCE_Zscore_200iters_MASK.niml.dset'];
-        brik = 0;
+        brik = '0';
+        label_new = [label_dv '_TFCE_Zscore'];
         cmap = '../cmaps/coolwarm.niml.cmap';
         dimfac = '0.6';
         i_range = '4.26';
         t_thresh = '-T_val 1.96';
+        brik_t = '0';
 
         % Call functions to create screenshots (first remove those that exist)
-        unix(['rm -f ' label '*.jpg & sleep 3']);
-        call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,0,brik);
+        unix(['rm -f ' label_new '*.jpg & sleep 3']);
+        call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,0,brik,brik_t);
         % Crop whitespace from all images and make consistent size
-        unix(['mogrify -trim ' label '*.jpg & sleep 3']);
-        unix(['mogrify -resize 1000x1000 ' label '*.jpg & sleep 3']);
+        unix(['mogrify -trim ' label_new '*.jpg & sleep 3']);
+        unix(['mogrify -resize 1000x1000 ' label_new '*.jpg & sleep 3']);
         % Create montage of all four views
-        create_montage(label,hemi);
+        create_montage(label_new,hemi);
 
         %% Bayes Factor Results
         % Set strings
         dset = [label_dv '.niml.dset'];
-        brik = 5;  % Bayes factor "both" map
+        brik = '5';  % Bayes factor "both" map
         label_new = [label_dv '_BFBoth'];
         cmap = '../cmaps/coolwarm.niml.cmap';
         dimfac = '0.6';
         i_range = '-19 19';
         t_thresh = '-T_val 2';
+        brik_t = '1';
 
         % Call functions to create screenshots (first remove those that exist)
         unix(['rm -f ' label_new '*.jpg & sleep 3']);
-        call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,1,brik);
+        call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,1,brik,brik_t);
         % Crop whitespace from all images and make consistent size
         unix(['mogrify -trim ' label_new '*.jpg & sleep 3']);
         unix(['mogrify -resize 1000x1000 ' label_new '*.jpg & sleep 3']);
@@ -95,16 +101,17 @@ for ii = 1:size(input_strings,1)
         %% Raw T-stat Results
         % Set strings
         dset = [label_dv '.niml.dset'];
-        brik = 2;  % Bayes factor "both" map
+        brik = '1';  % Bayes factor "both" map
         label_new = [label_dv '_Tstat'];
         cmap = '../cmaps/coolwarm.niml.cmap';
         dimfac = '0.6';
         i_range = '-5 5';
         t_thresh = '-T_val 2.06';
+        brik_t = '1';
 
         % Call functions to create screenshots (first remove those that exist)
         unix(['rm -f ' label_new '*.jpg & sleep 3']);
-        call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,1,brik);
+        call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,1,brik,brik_t);
         % Crop whitespace from all images and make consistent size
         unix(['mogrify -trim ' label_new '*.jpg & sleep 3']);
         unix(['mogrify -resize 1000x1000 ' label_new '*.jpg & sleep 3']);
@@ -190,7 +197,7 @@ end
 
 %% Global function to call SUMA
 % Will build a full tsch script line by line, then runs the sript
-function call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,sulc_off,brik) 
+function call_SUMA(dset,label,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,sulc_off,brik,brik_t) 
 % Remove script if it exists
 unix(['rm -f ' label '_DriveSuma.tcsh']);
 
@@ -216,7 +223,7 @@ str = ['suma -spec /Users/benconrad/.afni/data/suma_MNI152_2009/std.' mesh '.MNI
 % Load the statistic dataset
 str = ['DriveSuma -com surf_cont -load_dset ' dset ...
       ' -load_cmap ' cmap ' -I_sb ' brik ' -I_range ' i_range...
-      ' -T_sb 0 ' t_thresh ' -Dim ' dimfac ' -1_only n']; eval(addstr);
+      ' -T_sb ' brik_t ' ' t_thresh ' -Dim ' dimfac ' -1_only n']; eval(addstr);
 
 % Check if 1 or 2 masks specified and load
 if numel(dset_mask) == 1
