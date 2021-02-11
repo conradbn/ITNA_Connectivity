@@ -18,24 +18,18 @@ purge;
 top_dir = '/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/Results'; 
 cd(top_dir);
 
-% input_strings = {
-%     % Structural Connectivity - Linear models
-%     'LinMdl_SC_DigL','lh','ld141';...
-%     'LinMdl_SC_DigR','rh','ld141';...
-%     'LinMdl_SC_LetL','lh','ld141'};
-
 input_strings = {
     % Structural Connectivity - Linear models
     'SemiPartCorr_SC_DigL','lh','ld141';...
-    'SemiPartCorr_SC_DigR','rh','ld141';...
-    'SemiPartCorr_SC_LetL','lh','ld141'};
+    'LinMdl_SC_DigR','rh','ld141';...
+    'LinMdl_SC_LetL','lh','ld141'};
    
 
 %% Create screenshots and montage for each contrast result
 for ii = 1:size(input_strings,1)
     % Get inputs 
     label = input_strings{ii,1};
-    conn = strrep(label,'SemiPartCorr_','');
+    conn = strrep(label,'LinMdl_','');
     cd([top_dir '/' label])
     hemi = input_strings{ii,2};
     dens = input_strings{ii,3};
@@ -58,7 +52,7 @@ for ii = 1:size(input_strings,1)
     end
     
     %% Get the dependent variables from the existing files
-    dep_vars = dir(['SemiPartCorr_*' conn '.niml.dset']);
+    dep_vars = dir(['LinMdl_*' conn '.niml.dset']);
     for dd = 1:numel(dep_vars)
         label_dv = strrep(dep_vars(dd).name,'.niml.dset','');
         if contains(label_dv,'Dp') % Skip these results from a previous iteration of linear models
@@ -66,18 +60,18 @@ for ii = 1:size(input_strings,1)
         end
         %% TFCE Zscore Results
         % Set strings
-        dset = [label_dv '_TFCE_Zscore_200iters_MASK.niml.dset'];
+        dset = [label '_TFCE_Zscore_200iters_MASK.niml.dset'];
         brik = '0';
         label_new = [label_dv '_TFCE_Zscore'];
         cmap = '../cmaps/coolwarm.niml.cmap';
         dimfac = '0.6';
-        i_range = '1.97';
+        i_range = '4.26';
         t_thresh = '-T_val 1.96';
         brik_t = '0';
 
         % Call functions to create screenshots (first remove those that exist)
         unix(['rm -f ' label_new '*.jpg & sleep 3']);
-        call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,1,brik,brik_t);
+        call_SUMA(dset,label_new,hemi,mesh,cmap,dimfac,i_range,t_thresh,dset_mask,0,brik,brik_t);
         % Crop whitespace from all images and make consistent size
         unix(['mogrify -trim ' label_new '*.jpg & sleep 3']);
         unix(['mogrify -resize 1000x1000 ' label_new '*.jpg & sleep 3']);
