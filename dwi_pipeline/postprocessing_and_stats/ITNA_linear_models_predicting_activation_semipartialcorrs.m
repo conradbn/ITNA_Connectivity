@@ -49,17 +49,20 @@ data_spec_map = {'SC_DigL'              'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_en
 %                  'SC_WhlBrn_Dens_rh'    'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.rh.6mm.log.niml.dset'
 %                  'SC_WhlBrn_Leng_rh'    'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.rh.6mm.niml.dset'};
 
-dependent_vars = {'calcss_resid_PP19'
+dependent_vars = {'calc_skills_ss_resid_PP19'
                   'calc_skills_ss_PP19'
+                  'calcss_resid_PP19'
                   'lwidss_resid_PP19'
                   'fluencyss_resid_PP19'
                   'ITG_CON_PP19'     % Note the ITG variables will be appended with L_ or R_ depending on the input data
                   'ITG_DBL_CON_PP19'};
+              
+dependent_vars = {};
 
 %% Run models
 % Loop through each dataset specified (row) and run linear model predicting
 % activity levels
-for ii = 1:size(data_spec_map,1)
+for ii = 1:size(data_spec_map,1)    
      disp(num2str(ii));
      % Get labels and data file, as well as group mean for output data
      % template
@@ -91,15 +94,31 @@ for ii = 1:size(data_spec_map,1)
              Ttmp = T;
              Ttmp.Node_Conn = conn_data(jj,:)';
 
-             % Run linear modelling and save coefficients, tstats, and pvalues
-             % Predict digit present activity vs baseline
-             if contains(mdl_name,'SC')
-                 mdl_spec = [dv ' ~ Node_Conn + AgeMonths + female + BrainSegVolNotVent'];
-             else
-                 mdl_spec = [dv ' ~ Node_Conn + AgeMonths + female'];
+%              % Run linear modelling and save coefficients, tstats, and pvalues
+%              % Predict digit present activity vs baseline
+%              if contains(mdl_name,'SC')
+%                  mdl_spec = [dv ' ~ AgeMonths + female + BrainSegVolNotVent'];
+%                  %mdl_spec = [dv ' ~ Node_Conn + AgeMonths + female + BrainSegVolNotVent'];
+%              else
+%                  mdl_spec = [dv ' ~ AgeMonths + female'];
+%                  %mdl_spec = [dv ' ~ Node_Conn + AgeMonths + female'];
+%              end
+%              [est,t,p,bf10,bf01,bfboth] = run_linmdl(Ttmp,mdl_spec);
+             
+             % Run the semi-partial correlation
+             [~,~,resid] = regress(Ttmp.Node_Conn, table2array(Ttmp(:,{'AgeMonths' 'female' 'BrainSegVolNotVent'})));  
+             [bf10,r,p] = bf.corr(Ttmp.(dv),resid);
+             n = height(Ttmp);
+             t = r / ((1-r^2)/(n-2))^0.5
+             bf01 = 1/bf10;
+             if bf01 >= 1
+                 bfboth = -bf01+1;
+             elseif bf10 > 1
+                 bfboth = bf10-1;
              end
-             [est,t,p,bf10,bf01,bfboth] = run_linmdl(Ttmp,mdl_spec);
-             Stats(jj,:) = [est,t,p,bf10,bf01,bfboth];
+             Stats(jj,:) = [r,t,p,bf10,bf01,bfboth];
+             
+             
 %              if contains(mdl_name,'SC')
 %                  X = [Ttmp.Node_Conn, Ttmp.AgeMonths , Ttmp.female, Ttmp.BrainSegVolNotVent];
 %                  Y = Ttmp.(pv)
@@ -114,41 +133,48 @@ for ii = 1:size(data_spec_map,1)
          end
 
          % Save stats surface niml file
-         out_dir = [top_dir '/Results/LinMdl_' mdl_name];
+         out_dir = [top_dir '/Results/SemiPartCorr_' mdl_name];
          mkdir(out_dir);
          S = ds_mean;
-         S.labels = {'Estimate','Tstat','Pval','BF10','BF01','BFBoth'};
+         S.labels = {'Rho','Tstat','Pval','BF10','BF01','BFBoth'};
          S.data = Stats;
-         afni_niml_writesimple(S,[out_dir '/LinMdl_' dv '_x_' mdl_name '.niml.dset']);
+         afni_niml_writesimple(S,[out_dir '/SemiPartCorr_' dv '_x_' mdl_name '.niml.dset']);
          
         % NULL DATA (based on shuffling residuals after nuisance regression)
         % *** Freedman and Lane procedure described Winkler et al. 2014.
 
         % Run linear NUISANCE modelling to get residuals
         % Predict digit present activity vs baseline
-        if contains(mdl_name,'SC')
-            mdl_spec = [dv ' ~ AgeMonths + female + BrainSegVolNotVent'];
-        else
-            mdl_spec = [dv ' ~ AgeMonths + female'];
-        end
-        L = fitlm(T,mdl_spec);
-        T.Residuals_Tmp = L.Residuals.Raw;
-
-        out_dir = [top_dir '/Results/LinMdl_' mdl_name];
+%         if contains(mdl_name,'SC')
+%             mdl_spec = [dv ' ~ AgeMonths + female + BrainSegVolNotVent'];
+%         else
+%             mdl_spec = [dv ' ~ AgeMonths + female'];
+%         end
+%         L = fitlm(T,mdl_spec);
+%         T.Residuals_Tmp = L.Residuals.Raw;
+    
+        out_dir = [top_dir '/Results/SemiPartCorr_' mdl_name];
         StatsNull = zeros(size(conn_data,1),2); % = Model predicting Digit present activity vs baseline
         null_iters = 100;
         for nn = 1:null_iters
             % Randomize activity data
             Tnull = T;
             c = randperm(height(Tnull));
-            Tnull.Residuals_Tmp = Tnull.Residuals_Tmp(c);
+            %Tnull.Residuals_Tmp = Tnull.Residuals_Tmp(c);
 
             %updateWaitbar = waitbarParfor(size(P,1), ['Calculation in progress for ' strrep(mdl_name,'_', ' ') ' - NULL iteration #' num2str(nn)]);
             parfor jj = 1:size(conn_data,1)
                 Ttmp = Tnull;
                 Ttmp.Node_Conn = conn_data(jj,:)';
-                [b,SE] = linear_mdl_fast(Ttmp.Residuals_Tmp,Ttmp.Node_Conn);
-                StatsNull(jj,:) = [b(2), b(2)/SE(2)];
+                
+                % Run the semipartial correlation
+                [~,~,resid] = regress(Ttmp.Node_Conn, table2array(Ttmp(:,{'AgeMonths' 'female' 'BrainSegVolNotVent'}))); 
+                [r,p] = corr(Ttmp.(dv)(c),resid); % Randomize the order of the depedenent variable
+                n = height(Ttmp);
+                t = r / ((1-r^2)/(n-2))^0.5;
+     
+                %[b,SE] = linear_mdl_fast(Ttmp.Residuals_Tmp,Ttmp.Node_Conn);
+                StatsNull(jj,:) = [r, t];
                 % Progress bar update
                 %updateWaitbar(); %#ok<PFBNS>
             end
@@ -156,7 +182,7 @@ for ii = 1:size(data_spec_map,1)
             S = ds_mean;
             S.labels = {'Estimate','Tstat'};
             S.data = StatsNull;
-            afni_niml_writesimple(S,[out_dir '/LinMdl_' dv '_x_' mdl_name '_NULL_iter' num2str(nn, '%03.f') '.niml.dset']);
+            afni_niml_writesimple(S,[out_dir '/SemiPartCorr_' dv '_x_' mdl_name '_NULL_iter' num2str(nn, '%03.f') '.niml.dset']);
         end
      end
 end
