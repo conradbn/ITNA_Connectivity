@@ -3,7 +3,7 @@ purge
 out_dir = '/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/Results';    
 
 cd(out_dir)
-niters = 200; % Total number of iterations for TFCE
+niters = 100; % Total number of iterations for TFCE
 test = 1; % All of the tests here are one-sample tests'
 
 % input_strings = { % Linear Models
@@ -16,12 +16,14 @@ test = 1; % All of the tests here are one-sample tests'
                  
 
 input_strings = { % Linear Models
-                 'SC_DigL','lh','ld141',...
-                    'LitCoord_Digit_Pollack19_-57_-52_-11_std.141_lh.inflated.14mm_diam_INV.niml.dset';
-                 'SC_DigR','rh','ld141',...
-                    'LitCoord_Digit_Pollack19_54_-52_-14_std.141_rh.inflated.14mm_diam_INV.niml.dset'
-                 'SC_LetL','lh','ld141',...
-                    'LitCoord_Letter_Pollack19_-42_-64_-11_std.141_lh.inflated.14mm_diam_INV.niml.dset'}; 
+%                  'SC_DigL','lh','ld141',...
+%                     'LitCoord_Digit_Pollack19_-57_-52_-11_std.141_lh.inflated.14mm_diam_INV.niml.dset';
+%                  'SC_DigR','rh','ld141',...
+%                     'LitCoord_Digit_Pollack19_54_-52_-14_std.141_rh.inflated.14mm_diam_INV.niml.dset'
+%                  'SC_LetL','lh','ld141',...
+%                     'LitCoord_Letter_Pollack19_-42_-64_-11_std.141_lh.inflated.14mm_diam_INV.niml.dset'
+                 'SC_DigL-DigR','lh','ld141',...
+                    'LitCoord_Digit_Pollack19_-57_-52_-11_std.141_lh.inflated.14mm_diam_INV.niml.dset';}; 
 %                 'FC_DigL_ALL_Zmap','lh','ld60',...
 %                     'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam_INV.niml.dset';      
 %                  'FC_DigL_DpDa_Zdiff','lh','ld60',...
@@ -40,7 +42,13 @@ dependent_vars = {'calc_skills_ss_resid_PP19'
                   'fluencyss_resid_PP19'
                   'ITG_CON_PP19'     % Note the ITG variables will be appended with L_ or R_ depending on the input data
                   'ITG_DBL_CON_PP19'};
-
+              
+                            
+dependent_vars = {'LI_D_Pres'
+                  'LI_CON_PP19'
+                  'LI_D_Abs'};
+              
+%% 
 for ii = 1:size(input_strings,1)
      cd(out_dir)
      data_dir = ['SemiPartCorr_' input_strings{ii,1}];

@@ -35,9 +35,9 @@ T.R_ITG_DBL_CON_PP19 = T.R_ITG_CON_PP19 - T.R_ITG_CON_PP19_Let;
 
 %% Specify models to run
               % Output Label            % Data File        
-data_spec_map = {'SC_DigL'              'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
-                 'SC_DigR'              'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset'
-                 'SC_LetL'              'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
+data_spec_map = {%'SC_DigL'              'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
+                 %'SC_DigR'              'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset'
+                 %'SC_LetL'              'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
                  'SC_DigL-DigR'         'AllSubs_tracks_ss3t_50M_Dp-Da_MINUS_Dp-Da_math.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'};    
              
 %                  'FC_DigL_ALL_Zmap'     'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL.niml.dset'
