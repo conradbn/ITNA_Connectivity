@@ -37,10 +37,12 @@ for ii = 1:numel(atlas_names)
             % Load subject TDI map
             tdi = niftiread(niis(jj).name);
             % Run function
-            dice(jj) =  calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh);
+            [dice(jj),vol_tract(jj),vol_tdi(jj)] =  calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh);
         end
         % Add dice values to structure
         dice_all.(a_name)(kk,:) = dice; clear dice
+        dice_all.([a_name '_vol']) = vol_tract; clear vol_tract
+        dice_all.([a_name '_vol_tdi']) = vol_tdi; clear vol_tract
     end
     % Add tract label names to structure
     dice_all.([a_name '_labels'])(:) = a_table.BundleName';
@@ -108,7 +110,7 @@ for ii = 1:numel(atlas_names)
     T.Digit_area_L = squeeze(mean(dice_Reduced(:,:,1)))';
     T.Letter_area_L = squeeze(mean(dice_Reduced(:,:,2)))';
     T.Digit_area_R = squeeze(mean(dice_Reduced(:,:,3)))';
-    writetable(T,['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '_groupmean.csv']);
+    %writetable(T,['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '_groupmean.csv']);
     
     
     %% Run Ttests
@@ -183,11 +185,11 @@ for ii = 1:numel(atlas_names)
     low = min(dice_Reduced(:));
     high = max(dice_Reduced(:));
     ax.YLim = [0 high+.05];
-    export_fig(['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat'],'-png','-m2','-transparent');
+    %export_fig(['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat'],'-png','-m2','-transparent');
 end
 
 %% Dice overlap function
-function dice = calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh)
+function [dice,vol_tract,vol_tdi] = calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh)
     % Load the nifti images
     sthresh = tdi >= tdi_thresh; 
     bthresh = tract >= tract_thresh;
@@ -197,6 +199,8 @@ function dice = calculate_overlap_binary(tract,tdi,tract_thresh,tdi_thresh)
     VoxelsNumber2=sum(Seg2);
     CommonArea=sum(Seg1 & Seg2); 
     dice=(2*CommonArea)/(VoxelsNumber1+VoxelsNumber2);
+    vol_tdi = VoxelsNumber1;
+    vol_tract = VoxelsNumber2;
 end
     
 
