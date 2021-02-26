@@ -10,8 +10,10 @@ ctx = lut(contains(lut(:,2),'ctx_'),2);
 ctx_rois = cellfun(@(S) S(8:end), ctx, 'Uniform', 0);
 ctx_rois = unique(ctx_rois);
 ctx_rois(contains(ctx_rois,'Unknown')) = [];
+
+
 %%
-for tt =34% 1:numel(tfce_maps)
+for tt =10% 1:numel(tfce_maps)
     zscr_map = afni_niml_readsimple([tfce_maps(tt).folder '/' tfce_maps(tt).name]);
     % Set density and hemisphere
     if size(zscr_map.data,1) == 36002

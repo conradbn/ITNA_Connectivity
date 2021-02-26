@@ -158,7 +158,7 @@ input_strings = {
     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_SET2_MEAN.niml.dset','lh','ld60';...
     'PairedTest_FC_ALL_DigLH_vs_DigRH_on_RHsurf_SET2_MEAN.niml.dset','rh','ld60'};
 
-for ii = 1:3%:size(input_strings,1)
+for ii = 7:size(input_strings,1)
     % Get inputs 
     dset = input_strings{ii,1};
     hemi = input_strings{ii,2};
