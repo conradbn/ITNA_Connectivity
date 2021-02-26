@@ -41,13 +41,40 @@ for ii = 1:numel(atlas_names)
         end
         % Add dice values to structure
         dice_all.(a_name)(kk,:) = dice; clear dice
-        dice_all.([a_name '_vol']) = vol_tract; clear vol_tract
-        dice_all.([a_name '_vol_tdi']) = vol_tdi; clear vol_tract
+        dice_all.([a_name '_vol'])(kk,:) = vol_tract; clear vol_tract
+        dice_all.([a_name '_vol_tdi'])(kk,:) = vol_tdi; clear vol_tract
     end
     % Add tract label names to structure
     dice_all.([a_name '_labels'])(:) = a_table.BundleName';
 end
 save([process_dir '/../dice_Xtract_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat']);
+
+%% Create Table with all results
+for ii = 1:numel(atlas_names)
+    a_name = atlas_names{ii};
+    
+    labels = dice_all.([a_name '_labels'])(1,:);
+    dice = dice_all.(a_name)(:,:)';
+    vol_tract = dice_all.([a_name '_vol'])(:,:)';
+    vol_tdi = dice_all.([a_name '_vol_tdi'])(:,:)';
+    
+    % Recombine the data so it is in a more useful structure
+    T = table();
+    for jj = 1:numel(labels)
+        label = labels{jj};
+        T.(['DigL_' label]) = dice(1:3:end,jj);
+        T.(['DigR_' label]) = dice(2:3:end,jj);
+        T.(['LetL_' label]) = dice(3:3:end,jj);
+        T.(['DigL_vol_tract_' label]) = vol_tract(1:3:end,jj);
+        T.(['DigR_vol_tract_' label]) = vol_tract(2:3:end,jj);
+        T.(['LetL_vol_tract_' label]) = vol_tract(3:3:end,jj);
+        T.(['DigL_vol_tdi_' label]) = vol_tdi(1:3:end,jj);
+        T.(['DigR_vol_tdi_' label]) = vol_tdi(2:3:end,jj);
+        T.(['LetL_vol_tdi_' label]) = vol_tdi(3:3:end,jj);
+    end
+    writetable(T,['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '_ALLDATA.csv']);
+end
+
 
 %% Plot full results
 % clear all; close all
@@ -110,7 +137,7 @@ for ii = 1:numel(atlas_names)
     T.Digit_area_L = squeeze(mean(dice_Reduced(:,:,1)))';
     T.Letter_area_L = squeeze(mean(dice_Reduced(:,:,2)))';
     T.Digit_area_R = squeeze(mean(dice_Reduced(:,:,3)))';
-    %writetable(T,['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '_groupmean.csv']);
+    writetable(T,['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '_groupmean.csv']);
     
     
     %% Run Ttests
@@ -185,7 +212,7 @@ for ii = 1:numel(atlas_names)
     low = min(dice_Reduced(:));
     high = max(dice_Reduced(:));
     ax.YLim = [0 high+.05];
-    %export_fig(['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat'],'-png','-m2','-transparent');
+    export_fig(['bundle_overlap_' a_name '_allsubs_TDIthr' num2str(tdi_thresh) '_Bndlthr' num2str(tract_thresh) '.mat'],'-png','-m2','-transparent');
 end
 
 %% Dice overlap function
