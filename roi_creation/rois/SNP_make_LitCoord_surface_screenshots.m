@@ -1,21 +1,23 @@
 clear all
 cd('/Users/benconrad/Documents/GitHub/ITNA_Connectivity/roi_creation/rois')
 
-dsets_lh = dir('LitCoord_*_std.141_lh.inflated.4mm_diam.niml.dset');
-dsets_rh = dir('LitCoord_*_std.60_rh.inflated.4mm_diam.niml.dset');
+% dsets_lh = dir('LitCoord_*_std.141_lh.inflated.4mm_diam.niml.dset');
+% dsets_rh = dir('LitCoord_*_std.60_rh.inflated.4mm_diam.niml.dset');
 
+dsets_lh = dir('LitCoord_Letter_*_std.60_lh.inflated.4mm_diam.niml.dset');
+dsets_rh = dir('LitCoord_Letter_*_std.60_rh.inflated.4mm_diam.niml.dset');
 %% LH
-% mesh = '60';
-% hemi = 'lh';
-% dsets = dsets_lh;
-% label = ['SUMA_LitCoords_' hemi '_' mesh];
-% load_dsets_on_surface(mesh,hemi,label,dsets)
+mesh = '60';
+hemi = 'lh';
+dsets = dsets_lh;
+label = ['SUMA_LitCoords_' hemi '_' mesh];
+load_dsets_on_surface(mesh,hemi,label,dsets)
 
 %% RH
-mesh = '141';
+mesh = '60';
 hemi = 'rh';
 dsets = dsets_rh;
-label = 'LitCoord_RH';
+label = ['SUMA_LitCoords_' hemi '_' mesh];
 load_dsets_on_surface(mesh,hemi,label,dsets)
 
 
@@ -40,7 +42,7 @@ function [] = load_dsets_on_surface(mesh,hemi,label,dsets)
         if contains(n,'Letter')
             % Load the statistic dataset
             str = ['DriveSuma -com surf_cont -load_dset ' n ...
-                ' -switch_cmap blue_monochrome -I_sb 1 -I_range 0.5 -Dim 1 -1_only n'];eval(addstr);
+                ' -switch_cmap blue_monochrome -I_sb 1 -I_range 1 -Dim .6 -1_only n'];eval(addstr); % Dim 1
         elseif contains(n,'Word')
             % Load the statistic dataset
             str = ['DriveSuma -com surf_cont -load_dset ' n ...

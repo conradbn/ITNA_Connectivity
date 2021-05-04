@@ -48,7 +48,12 @@ label_coord_diam = {'LitCoord_Digit_Yeo17'        '55 -50 -12'  '7'
                     % 'LitCoord_Letter_Gauthier00'    '-55.3 -64.5 5.3' '3'
                     % 'LitCoord_Letter_James05_sngl' '-43.7 -38.5 -3.7' '3'
                     % 'LitCoord_Letter_James05_strs' '-31.8 -67.1 -3.6' '3'           
-label_coord_diam = {'Letter_Area_Mean_12LitCoords' '-42.7125  -60.1500  -13.1792' '14'};
+%label_coord_diam = {'Letter_Area_Mean_12LitCoords' '-42.7125  -60.1500  -13.1792' '14'};
+
+label_coord_diam = {'MetaAnalysisCoord_Number_Children_Arsalidou17' '38 -48 54' '14'
+                    'MetaAnalysisCoord_Number_Children_Arsalidou17' '38 -46 42' '28' 
+                    'MetaAnalysisCoord_Number_Children_Arsalidou17' '34 -34 48' '14'
+                    'MetaAnalysisCoord_Calc_Children_Arsalidou17'   '-42 -48 42' '28'};
    
 mesh = '60';%'141';
 
