@@ -31,6 +31,7 @@ label_coord_diam = {'LitCoord_Digit_Yeo17'        '55 -50 -12'  '7'
                     'LitCoord_Letter_Abboud16'    '-40 -47 -12' '4'
                     'LitCoord_Word_Cohen00'       '-42 -57 -6'  '4'
                     'LitCoord_Word_Cattinelli13'  '-45 -47 -12' '4'
+                    'LitCoord_Word_Dehaene10'     '-44 -50 -14' '4'
                     'LitCoord_Letter_Rothlein14'   '-31 -59 -20' '4'
                     'LitCoord_Letter_Grotheer16'   '-47 -56 -14' '4'
                     'LitCoord_Digit_Amalric16'     '-56 -51 -19' '4'
@@ -50,14 +51,14 @@ label_coord_diam = {'LitCoord_Digit_Yeo17'        '55 -50 -12'  '7'
                     % 'LitCoord_Letter_James05_strs' '-31.8 -67.1 -3.6' '3'           
 %label_coord_diam = {'Letter_Area_Mean_12LitCoords' '-42.7125  -60.1500  -13.1792' '14'};
 
-label_coord_diam = {'MetaAnalysisCoord_Number_Children_Arsalidou17' '38 -48 54' '14'
-                    'MetaAnalysisCoord_Number_Children_Arsalidou17' '38 -46 42' '28' 
-                    'MetaAnalysisCoord_Number_Children_Arsalidou17' '34 -34 48' '14'
-                    'MetaAnalysisCoord_Calc_Children_Arsalidou17'   '-42 -48 42' '28'};
-   
-mesh = '60';%'141';
+% label_coord_diam = {'MetaAnalysisCoord_Number_Children_Arsalidou17' '38 -48 54' '14'
+%                     'MetaAnalysisCoord_Number_Children_Arsalidou17' '38 -46 42' '28' 
+%                     'MetaAnalysisCoord_Number_Children_Arsalidou17' '34 -34 48' '14'
+%                     'MetaAnalysisCoord_Calc_Children_Arsalidou17'   '-42 -48 42' '28'};
+%    
+mesh = '141';%'60';
 
-% Loop through and write to text file
+%% Loop through and write to text file
 for ii = 1:size(label_coord_diam,1)
     l = label_coord_diam{ii,1};
     c = label_coord_diam{ii,2};
