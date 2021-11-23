@@ -59,18 +59,25 @@ for ii = 1:size(input_strings,1)
     
     % Set mask dataset(s) based on label
     dset_mask = {};
+    % Digit LH ROI
     if contains(label,'DigLH') && strcmp(hemi,'lh')
         dset_mask = [dset_mask,['../Masks/LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
     elseif contains(label,'DigLH')
         dset_mask = [dset_mask,['../Masks/LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam_MAP2CON.niml.dset']];
     end
+    % Digit RH ROI
     if contains(label,'DigRH') && strcmp(hemi,'lh')
         dset_mask = [dset_mask,['../Masks/LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam_MAP2CON.niml.dset']];
     elseif contains(label,'DigRH')
         dset_mask = [dset_mask,['../Masks/LitCoord_Digit_Pollack19_54_-52_-14_std.' mesh '_rh.inflated.14mm_diam.niml.dset']];
     end
-    if  contains(label,'LetLH') 
+    % Letter LH ROI
+    if contains(label,'LetLH')
         dset_mask = [dset_mask,['../Masks/LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']];
+    end
+    % LH ROIs but RH data (empty mask)
+    if contains(label,'LetLH') && contains(label,'DigLH') && strcmp(hemi,'rh')
+        dset_mask = '';
     end
     
     %% TFCE Zscore Results
@@ -160,9 +167,13 @@ input_strings = {
     % Functional Connectivity
     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_SET1_MEAN.niml.dset','lh','ld60';...
     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_SET2_MEAN.niml.dset','lh','ld60';...
-    'PairedTest_FC_ALL_DigLH_vs_DigRH_on_RHsurf_SET2_MEAN.niml.dset','rh','ld60'};
+    'PairedTest_FC_ALL_DigLH_vs_DigRH_on_RHsurf_SET2_MEAN.niml.dset','rh','ld60';...
+    
+    % SUPPLEMENTAL
+    'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh_SET1_MEAN.niml.dset','rh','ld60';...
+    'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh_SET2_MEAN.niml.dset','rh','ld60'};
 
-for ii = 7:size(input_strings,1)
+for ii = 10:size(input_strings,1)
     % Get inputs 
     dset = input_strings{ii,1};
     hemi = input_strings{ii,2};
@@ -171,7 +182,7 @@ for ii = 7:size(input_strings,1)
     % Set strings
     label = strrep(dset,'.niml.dset','');
     mesh = strrep(dens,'ld','');
-    cmap = 'cmaps/rainbow.niml.cmap';
+    cmap = '../cmaps/rainbow.niml.cmap';
     dimfac = '0.5';
     
     if contains(label,'SC')
@@ -183,7 +194,9 @@ for ii = 7:size(input_strings,1)
     end 
     
     % Set mask dataset(s) based on label
-    if contains(label,'DigLH') && contains(label,'SET1')
+    if (contains(label,'DigLH') || contains(label,'DigLH')) && strcmp(hemi,'rh')
+        dset_mask = '';
+    elseif contains(label,'DigLH') && contains(label,'SET1')
        dset_mask = {['Masks/LitCoord_Digit_Pollack19_-57_-52_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
     elseif contains(label,'LetLH') && contains(label,'SET2')
        dset_mask = {['Masks/LitCoord_Letter_Pollack19_-42_-64_-11_std.' mesh '_lh.inflated.14mm_diam.niml.dset']};
@@ -232,7 +245,9 @@ str = ['DriveSuma -com surf_cont -load_dset ' dset ...
       ' -T_sb 0 ' t_thresh ' -Dim ' dimfac ' -1_only n']; eval(addstr);
 
 % Check if 1 or 2 masks specified and load
-if numel(dset_mask) == 1
+if isempty(dset_mask)
+    str = ''; eval(addstr);
+elseif numel(dset_mask) == 1
     str = ['DriveSuma -com surf_cont -load_dset ' dset_mask{1} ' -switch_cmap inverted_gray_circle -I_sb 1 -I_range 1']; eval(addstr);
 elseif numel(dset_mask) == 2
     str = ['DriveSuma -com surf_cont -load_dset ' dset_mask{1} ' -switch_cmap inverted_gray_circle -I_sb 1 -I_range 1']; eval(addstr);
