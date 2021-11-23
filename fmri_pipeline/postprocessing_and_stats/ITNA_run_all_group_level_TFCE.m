@@ -33,8 +33,7 @@ input_strings = {
 %     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH','lh','ld60',...
 %     'GroupMask_DigLH_LetLH_ld60.niml.dset',...
 %         'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL.niml.dset',...
-%         'AllSubs_Lp-La.lh.beta_series_corr.lh.Zmap.ALL.niml.dset';
-%         
+%         'AllSubs_Lp-La.lh.beta_series_corr.lh.Zmap.ALL.niml.dset'};        
 %         
 %     'PairedTest_FC_Dp_DigLH_vs_Da_DigLH','lh','ld60',...
 %     'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam_INV.niml.dset',...
@@ -54,7 +53,7 @@ input_strings = {
         
     % SUPPLEMENTAL - contralateral hemisphere
     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh','rh','ld60',...
-    'GroupMask_DigLH_LetLH_ld60.niml.dset',... % No mask on opposite hemisphere
+    '',... % No mask on opposite hemisphere
         'AllSubs_Dp-Da.lh.beta_series_corr.rh.Zmap.ALL.niml.dset',...
         'AllSubs_Lp-La.lh.beta_series_corr.rh.Zmap.ALL.niml.dset'};
                 
@@ -177,7 +176,7 @@ cd(data_dir)
 niters = 100000; % Total number of iterations for TFCE
 test = 1; % All of the tests here are one-sample tests
 
-for ii = 1:3%size(input_strings,1)
+for ii = 1:size(input_strings,1)
     % Get the label for this test 
     label = [out_dir '/' input_strings{ii,1}];
     hemi = input_strings{ii,2};
@@ -239,8 +238,10 @@ for ii = 1:3%size(input_strings,1)
     % Create count map (to potentially use in place of TFCE result)
     ds = afni_niml_readsimple(in_dset);
     ds.data = sum(ds.data,2)./size(ds.data,2);
-    ds_mask = afni_niml_readsimple(mask_dset);
-    ds.data = ds.data .* ds_mask.data;
+    if ~isempty(mask_dset)
+        ds_mask = afni_niml_readsimple(mask_dset);
+        ds.data = ds.data .* ds_mask.data;
+    end
     out_count = [label '_ALLDATA_count.niml.dset'];
     afni_niml_writesimple(ds,out_count);
     
@@ -268,9 +269,9 @@ surf_ds = cosmo_surface_dataset(surf_ds);
 
 % Get faces and vertices info from MNI surface gii file
 if strcmp(density,'ld60')
-    surf_gii = ['/Users/nbl_imac2/.afni/data/suma_MNI152_2009/std.60.' hemi '.smoothwm.gii'];
+    surf_gii = ['/Users/nbl_imac2/Documents/GitHub/ITNA_Connectivity/roi_creation/rois/std.60.' hemi '.smoothwm.gii'];
 elseif strcmp(density,'ld141')
-    surf_gii = ['/Users/nbl_imac2/.afni/data/suma_MNI152_2009/std.141.' hemi '.smoothwm.gii'];
+    surf_gii = ['/Users/nbl_imac2/Documents/GitHub/ITNA_Connectivity/roi_creation/rois/std.141.' hemi '.smoothwm.gii'];
 end
 
 [vertices,faces]=surfing_read(surf_gii);
