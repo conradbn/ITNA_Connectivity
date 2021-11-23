@@ -54,24 +54,24 @@ input_strings = {
         
     % SUPPLEMENTAL - contralateral hemisphere
     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh','rh','ld60',...
-    '',... % No mask on opposite hemisphere
+    'GroupMask_DigLH_LetLH_ld60.niml.dset',... % No mask on opposite hemisphere
         'AllSubs_Dp-Da.lh.beta_series_corr.rh.Zmap.ALL.niml.dset',...
-        'AllSubs_Lp-La.lh.beta_series_corr.rh.Zmap.ALL.niml.dset';
+        'AllSubs_Lp-La.lh.beta_series_corr.rh.Zmap.ALL.niml.dset'};
                 
-    'PairedTest_FC_Dp_DigLH_vs_Da_DigLH_on_rh','rh','ld60',...
-    '',... % No mask on opposite hemisphere
-        'AllSubs_Dp-Da.lh.beta_series_corr.rh.Zmap.Dp.niml.dset',...
-        'AllSubs_Dp-Da.lh.beta_series_corr.rh.Zmap.Da.niml.dset';
-        
-    'PairedTest_FC_Lp_LetLH_vs_La_LetLH_on_rh','rh','ld60',...
-    '',... % No mask on opposite hemisphere
-        'AllSubs_Lp-La.lh.beta_series_corr.rh.Zmap.Lp.niml.dset',...
-        'AllSubs_Lp-La.lh.beta_series_corr.rh.Zmap.La.niml.dset';  
-                
-    'PairedTest_FC_Dp-Da_DigLH_vs_Lp-La_LetLH_on_rh','rh','ld60',...
-    '',... % No mask on opposite hemisphere
-        'AllSubs_Dp-Da.lh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset',...
-        'AllSubs_Lp-La.lh.beta_series_corr.rh.Zdiff.Lp-La.niml.dset'};  
+%     'PairedTest_FC_Dp_DigLH_vs_Da_DigLH_on_rh','rh','ld60',...
+%     '',... % No mask on opposite hemisphere
+%         'AllSubs_Dp-Da.lh.beta_series_corr.rh.Zmap.Dp.niml.dset',...
+%         'AllSubs_Dp-Da.lh.beta_series_corr.rh.Zmap.Da.niml.dset';
+%         
+%     'PairedTest_FC_Lp_LetLH_vs_La_LetLH_on_rh','rh','ld60',...
+%     '',... % No mask on opposite hemisphere
+%         'AllSubs_Lp-La.lh.beta_series_corr.rh.Zmap.Lp.niml.dset',...
+%         'AllSubs_Lp-La.lh.beta_series_corr.rh.Zmap.La.niml.dset';  
+%                 
+%     'PairedTest_FC_Dp-Da_DigLH_vs_Lp-La_LetLH_on_rh','rh','ld60',...
+%     '',... % No mask on opposite hemisphere
+%         'AllSubs_Dp-Da.lh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset',...
+%         'AllSubs_Lp-La.lh.beta_series_corr.rh.Zdiff.Lp-La.niml.dset'};  
         
 %     % Functional Connectivity Contrasts - Task-level        
 %     'PairedTest_FC_DTask_DigLH_vs_LTask_DigLH','lh','ld60',...
@@ -257,9 +257,7 @@ function [] = setup_run_TFCE(in_dset,mask_dset,niters,out,test,hemi,density,out_
 % Load in the subject data
 surf_ds = afni_niml_readsimple(in_dset);
 % Mask the subject data (if provided)
-if mask_dset == ''
-    surf_ds.data = surf_ds.data;
-else
+if ~isempty(mask_dset)
     mask_ds = afni_niml_readsimple(['/Users/nbl_imac2/Documents/GitHub/ITNA_Connectivity/roi_creation/rois/' mask_dset]);
     surf_ds.data = surf_ds.data .* mask_ds.data;
 end
@@ -270,9 +268,9 @@ surf_ds = cosmo_surface_dataset(surf_ds);
 
 % Get faces and vertices info from MNI surface gii file
 if strcmp(density,'ld60')
-    surf_gii = ['/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface/suma_MNI152_2009/std.60.' hemi '.smoothwm.gii'];
+    surf_gii = ['/Users/nbl_imac2/.afni/data/suma_MNI152_2009/std.60.' hemi '.smoothwm.gii'];
 elseif strcmp(density,'ld141')
-    surf_gii = ['/Users/nbl_imac2/Desktop/Price_NFA_Tractography_Surface/suma_MNI152_2009/std.141.' hemi '.smoothwm.gii'];
+    surf_gii = ['/Users/nbl_imac2/.afni/data/suma_MNI152_2009/std.141.' hemi '.smoothwm.gii'];
 end
 
 [vertices,faces]=surfing_read(surf_gii);
