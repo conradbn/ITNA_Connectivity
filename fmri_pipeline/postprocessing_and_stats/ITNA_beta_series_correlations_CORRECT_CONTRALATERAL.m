@@ -11,7 +11,7 @@ seed = {'Dp-Da' 'Lp-La'};
 hemi = {'lh' 'rh'};
 
 % For each subject
-for sub = 1:numel(fnames)
+for sub = 2:numel(fnames)
     
     % Load the subject variables saved in workspace .mat file
     cd(dir_start)
@@ -85,10 +85,10 @@ for sub = 1:numel(fnames)
         betas = [dir_beta '/' subj '_' h '_LSS_betas.niml.dset'];
         b = afni_niml_readsimple(betas);
         
-        % ******* MATH ROI ONLY IN RIGHT HEMISPHERE ********
-        if strcmp(h,'lh')
-            continue
-        end
+%         % ******* MATH ROI ONLY IN RIGHT HEMISPHERE ********
+%         if strcmp(h,'lh')
+%             continue
+%         end
         % ******************************************
         
         % For each seed ROI
@@ -199,7 +199,7 @@ for sub = 1:numel(fnames)
                 n1 = ecounts(strcmp(label,c1),1);
                 n2 = ecounts(strcmp(label,c2),1);
                 % For the data in each hemisphere
-                for hhh = 1:numel(hemi)
+                for hhh = 2%:numel(hemi)
                     hem = hemi{hhh};
                     % True data
                     z1 = afni_niml_readsimple([subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' c1 '.niml.dset']);
