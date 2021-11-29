@@ -133,43 +133,53 @@ clear all
 cd('/Volumes/NBL_Projects/Price_NFA/Analyses_for_Paper/AllSubs_dsets')
 
 % Set data files to map, including mesh density and mapping direction
-data = {'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.niml.dset'
-        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset'
-        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset'
-        'ld60'  'RtoL' 'homotopic_correspondence_RtoL_ld60_rh.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.Dp.niml.dset'
-        'ld60'  'LtoR' 'homotopic_correspondence_LtoR_ld60_lh.niml.dset'
-        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.ALL.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL.niml.dset'
-        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.ALL_DTask.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL_DTask.niml.dset'
+data = {%'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.14mm_diam.niml.dset'
+%         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff.Dp-Da.niml.dset'
+%         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.Dp.niml.dset'
+%         'ld60'  'RtoL' 'homotopic_correspondence_RtoL_ld60_rh.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_std.60.lh.PP19_Dp-Da.MNI152.votc.inflated.14mm_diam.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.Dp.niml.dset'
+%         'ld60'  'LtoR' 'homotopic_correspondence_LtoR_ld60_lh.niml.dset'
+%         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.ALL.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL.niml.dset'
+%         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zmap.ALL_DTask.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zmap.ALL_DTask.niml.dset'
+%         
+%         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff_Pval_thr01.Dp-Da.niml.dset'
+%         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.Dp.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff_Pval_thr01.Dp-Da.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.Dp.niml.dset'
+%         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.ALL.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.ALL.niml.dset'
+%         'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.ALL_DTask.niml.dset'
+%         'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.ALL_DTask.niml.dset'
+%         
+%         'ld141' 'RtoL' 'Allsubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
+%         'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset'
+%         'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.rh.6mm.niml.dset'
+%         'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.rh.6mm.niml.dset'
+%         'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.rh.6mm.log.niml.dset'
+%         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+%         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
+%         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+%         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
+%         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.lh.6mm.niml.dset'
+%         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+%         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.log.niml.dset'
         
-        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Zdiff_Pval_thr01.Dp-Da.niml.dset'
-        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.Dp.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Zdiff_Pval_thr01.Dp-Da.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.Dp.niml.dset'
-        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.ALL.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.ALL.niml.dset'
-        'ld60'  'RtoL' 'AllSubs_Dp-Da_math.rh.beta_series_corr.rh.Pval_thr005.ALL_DTask.niml.dset'
-        'ld60'  'LtoR' 'AllSubs_Dp-Da.lh.beta_series_corr.lh.Pval_thr005.ALL_DTask.niml.dset'
-        
-        'ld141' 'RtoL' 'Allsubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
-        'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.log+c.niml.dset'
-        'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.rh.6mm.niml.dset'
-        'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.rh.6mm.niml.dset'
-        'ld141' 'RtoL' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.rh.6mm.log.niml.dset'
-        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
-        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
-        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
-        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
-        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_length_map.al2anat.lh.6mm.niml.dset'
-        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.niml.dset'
-        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M.wholebrain_TDI_ends.norm.al2anat.lh.6mm.log.niml.dset'};
+        % SUPPLEMENTAL - CONTRALATERAL
+        'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Zdiff.Dp-Da.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Zmap.Dp.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Zmap.ALL.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Zmap.ALL_DTask.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Zdiff_Pval_thr01.Dp-Da.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Pval_thr005.Dp.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Pval_thr005.ALL.niml.dset'
+        'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Pval_thr005.ALL_DTask.niml.dset'};
     
 % Loop through each dataset
-for ii = 1:numel(data,1)
+for ii = 2:size(data,1)
     % Load data structure
     data_struct = afni_niml_readsimple(data{ii,3});
     % Get mapping direction

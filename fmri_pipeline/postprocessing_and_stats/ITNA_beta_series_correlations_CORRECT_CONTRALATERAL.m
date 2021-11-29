@@ -6,13 +6,13 @@ dir_start = '/Volumes/NBL_Projects/Price_NFA/NFA_fMRI/ProcessedData/';
 cd(dir_start);
 fnames = dir('*_proc');
 
-seed = {'Dp-Da' 'Lp-La'};
-%seed = {'Dp-Da_math'};
+%seed = {'Dp-Da' 'Lp-La'};
+seed = {'Dp-Da_math'};
 hemi = {'lh' 'rh'};
 
 % For each subject
-for sub = 2:numel(fnames)
-    
+parfor sub = 1:numel(fnames)
+
     % Load the subject variables saved in workspace .mat file
     cd(dir_start)
     cd(fnames(sub).name);
@@ -78,17 +78,17 @@ for sub = 2:numel(fnames)
                 'Lp','La'};
              
     % For seeds in each hemisphere
-    for hh = 1%:numel(hemi)
+    for hh = 1:numel(hemi)
         h = hemi{hh};
         
         % Read in the beta series dataset
         betas = [dir_beta '/' subj '_' h '_LSS_betas.niml.dset'];
         b = afni_niml_readsimple(betas);
         
-%         % ******* MATH ROI ONLY IN RIGHT HEMISPHERE ********
-%         if strcmp(h,'lh')
-%             continue
-%         end
+        % ******* MATH ROI ONLY IN RIGHT HEMISPHERE ********
+        if strcmp(h,'lh')
+            continue
+        end
         % ******************************************
         
         % For each seed ROI
@@ -111,7 +111,7 @@ for sub = 2:numel(fnames)
             for ee = 1:numel(label)
                 e = label{ee};
                 % For the data in each hemisphere
-                for hhh = 2%1:numel(hemi)
+                for hhh = 1%:numel(hemi)
                     hem = hemi{hhh};
                     %% True beta series correlations
                     % Read in the beta series dataset
@@ -153,6 +153,7 @@ for sub = 2:numel(fnames)
                     % and all OTHER trials
                     % Only do the ALL trials map once
                     if ee == 1
+                        bcorr_all = [];
                         % Get index for ALL trials (uncensored)
                         events_all = find(events_censor == 0);
                         % Calculate correlation at every node
@@ -167,6 +168,7 @@ for sub = 2:numel(fnames)
                     events_other = events ~= ee & events_censor == 0;
                     % Calculate correlation at every node
                     bs_corr = corr(bs_seed(events_other),b.data(:,events_other)');
+                    bcorr_other = [];
                     bcorr_other.data = bs_corr';
                     afni_niml_writesimple(bcorr_other,[subj '.' s '.' h '.beta_series_corr.' hem '.Rmap.' e '_OTHER.niml.dset']);
                     % Fisher Z transform
@@ -199,7 +201,7 @@ for sub = 2:numel(fnames)
                 n1 = ecounts(strcmp(label,c1),1);
                 n2 = ecounts(strcmp(label,c2),1);
                 % For the data in each hemisphere
-                for hhh = 2%:numel(hemi)
+                for hhh = 1%:numel(hemi)
                     hem = hemi{hhh};
                     % True data
                     z1 = afni_niml_readsimple([subj '.' s '.' h '.beta_series_corr.' hem '.Zmap.' c1 '.niml.dset']);
