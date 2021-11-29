@@ -44,12 +44,15 @@ input_strings = {
 %     'PairedTest_FC_Dp-Da_DigLH_vs_DigRH_on_RHsurf','rh','ld60';...
     
     % SUPPLEMNENTAL 
-    'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh','rh','ld60';...
-    };
+%     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh','rh','ld60';...
+    'PairedTest_FC_ALL_DigLH_vs_DigRH_on_LHsurf_contra','rh','ld60'};
    
 
 %% Create screenshots and montage for each contrast result
 for ii = 1:size(input_strings,1)
+    if exist(input_strings{ii,1},'dir')
+        cd(input_strings{ii,1});
+    end
     % Get inputs 
     label = input_strings{ii,1};
     cd([top_dir '/' label])
@@ -77,6 +80,10 @@ for ii = 1:size(input_strings,1)
     end
     % LH ROIs but RH data (empty mask)
     if contains(label,'LetLH') && contains(label,'DigLH') && strcmp(hemi,'rh')
+        dset_mask = '';
+    end
+    
+    if contains(label,'DigLH') && contains(label,'DigRH') && strcmp(hemi,'rh')
         dset_mask = '';
     end
     
@@ -171,7 +178,8 @@ input_strings = {
     
     % SUPPLEMENTAL
     'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh_SET1_MEAN.niml.dset','rh','ld60';...
-    'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh_SET2_MEAN.niml.dset','rh','ld60'};
+    'PairedTest_FC_ALL_DigLH_vs_ALL_LetLH_on_rh_SET2_MEAN.niml.dset','rh','ld60';...
+    'PairedTest_FC_Dp_DigRH_vs_Da_DigRH_on_RHsurf_contra'};
 
 for ii = 10:size(input_strings,1)
     % Get inputs 
