@@ -13,7 +13,10 @@ fnames = {'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.niml.ds
           'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
           'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm_MAP2CON.niml.dset'
           'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
-          'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm_MAP2CON.niml.dset'};
+          'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm_MAP2CON.niml.dset'
+          'AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
+          'AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
+          'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm_MAP2CON.niml.dset'};
       
 % Specify the ROIs to be used for masking      
 rois =  {'LitCoord_Digit_Pollack19_-57_-52_-11_std.141_lh.inflated.14mm_diam.niml.dset'
@@ -25,7 +28,10 @@ rois_use_list = [1,2,3;...
                  1,2,3;...
                  1,2,3;...
                  4,5,NaN;...
-                 4,5,NaN];
+                 4,5,NaN;...
+                 NaN,NaN,NaN;... % Contralateral hemisphere (no seed masking) 
+                 NaN,NaN,NaN;...
+                 NaN,NaN,NaN];
                 
 % Set proportion to keep based on consistency
 prop_edges_keep_all = [0.005,0.01,0.02,0.04,0.08,0.15,0.30];% i.e. 0.30 = 30% density, based on edge consistency
