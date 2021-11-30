@@ -64,6 +64,51 @@ afni_niml_writesimple(mout,label);
 mout.data = ~mout.data;
 afni_niml_writesimple(mout,['INV_' label]);
 
+% SUPPLEMENTAL - CONTRALATERAL HEMISPHERE
+
+m1 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset');
+m2 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset');
+mout = m1;
+mout.data = m1.data == 1 | m2.data == 1;
+label = 'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_DigLH_plus_LetLH.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset';
+afni_niml_writesimple(mout,label);
+mout.data = ~mout.data;
+afni_niml_writesimple(mout,['INV_' label]);
+
+
+m1 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset');
+m2 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm_MAP2CON.niml.dset');
+mout = m1;
+mout.data = m1.data == 1 | m2.data == 1;
+label = 'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_DigLH_plus_DigRH.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset';
+afni_niml_writesimple(mout,label);
+mout.data = ~mout.data;
+afni_niml_writesimple(mout,['INV_' label]);
+
+
+m1 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset');
+m2 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset');
+mout = m1;
+mout.data = m1.data == 1 & m2.data == 1;
+label = 'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_DigLH_CONJ_LetLH.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset';
+afni_niml_writesimple(mout,label);
+mout.data = ~mout.data;
+afni_niml_writesimple(mout,['INV_' label]);
+
+
+m1 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset');
+m2 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm_MAP2CON.niml.dset');
+mout = m1;
+mout.data = m1.data == 1 & m2.data == 1;
+label = 'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_DigLH_CONJ_DigRH.lh.TDI_ends.norm.al2anat.rh.6mm.niml.dset';
+afni_niml_writesimple(mout,label);
+mout.data = ~mout.data;
+afni_niml_writesimple(mout,['INV_' label]);
+
+
+
+
+
 %% Write the single ROI inverse maps (for masking the raw structural connectivity images)
 label = {'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
         'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
