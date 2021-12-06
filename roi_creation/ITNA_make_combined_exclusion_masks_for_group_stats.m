@@ -6,14 +6,43 @@ roi_dir = '/Users/nbl_imac2/Documents/GitHub/ITNA_Connectivity/roi_creation/rois
 cd(roi_dir)
 
 %% First get combination and then inverse of consistency threshold masks
+
+% Group masks for Digit vs Letter - Structural Connectivity 
+% Includes consistency based threshold mask at 30% density (across both
+% hemispheres combined) for each ROI. Either their combination (PLUS) or
+% their conjunction (CONJ) Also masks the two ROIs themselves to avoid self
+% connectivity in contrasts/stats.
 m1 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset');
 m2 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Lp-La.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset');
-mout = m1;
-mout.data = m1.data == 1 | m2.data == 1;
-label = 'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_DigLH_plus_LetLH.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset';
+r1 = 'LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam.niml.dset[1]';
+r2 = 'LitCoord_Letter_Pollack19_-42_-64_-11_std.60_lh.inflated.14mm_diam.niml.dset[1]';
+
+mout_conj = m1;
+mout_plus = m1;
+
+mout_conj.data = m1.data == 1 | m2.data == 1;
+mout_plus.data = m1.data == 1 & m2.data == 1;
+
+label_conj = 'consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_DigLH_PLUS_LetLH.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset';
 afni_niml_writesimple(mout,label);
 mout.data = ~mout.data;
 afni_niml_writesimple(mout,['INV_' label]);
+
+
+unix(['3dcalc -overwrite -prefix GroupMask_DigLH_DigRH_on_LHsurf_ld60.niml.dset'...
+       ' -a LitCoord_Digit_Pollack19_-57_-52_-11_std.60_lh.inflated.14mm_diam.niml.dset[1]'...
+       ' -b '...
+       ' -expr "not(or(a,b))"']);
+
+
+
+
+
+
+
+
+
+
 
 
 m1 = afni_niml_readsimple('consistency.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da.lh.TDI_ends.norm.al2anat.lh.6mm.niml.dset');

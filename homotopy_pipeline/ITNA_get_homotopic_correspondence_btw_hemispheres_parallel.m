@@ -179,7 +179,11 @@ data = {%'ld60'  'RtoL' 'AllSubs_std.60.rh.PP19_Dp-Da_math.MNI152.votc.inflated.
 %         'ld60'  'LtoR' 'AllSubs_Dp-Da_math.rh.beta_series_corr.lh.Pval_thr005.ALL_DTask.niml.dset'
         
 %         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.log+c.niml.dset'
-        'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+%         'ld141' 'LtoR' 'AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
+        
+        % CONSISTENCY MASKS
+        'ld141' 'RtoL' 'Consistency_Thresholding/consistency.combined_hemis.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.rh.6mm.niml.dset'
+        'ld141' 'LtoR' 'Consistency_Thresholding/consistency.combined_hemis.0.3.group_mask.AllSubs_tracks_ss3t_50M_Dp-Da_math.rh.TDI_ends.norm.al2anat.lh.6mm.niml.dset'
 };
     
 % Loop through each dataset
